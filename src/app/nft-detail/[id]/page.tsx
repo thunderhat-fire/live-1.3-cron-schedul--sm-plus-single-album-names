@@ -76,7 +76,9 @@ interface NFT {
   digitalNotificationSent: boolean;
   createdAt: string;
   updatedAt: string;
-  user?: {
+  user: {
+    name?: string;
+    image?: string;
     id: string;
   };
 }
