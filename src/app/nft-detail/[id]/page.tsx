@@ -74,6 +74,8 @@ interface NFT {
   isDeleted: boolean;
   orders: Order[];
   digitalNotificationSent: boolean;
+  createdAt: string;
+  updatedAt: string;
   user?: {
     id: string;
   };
