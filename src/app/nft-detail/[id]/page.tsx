@@ -52,12 +52,16 @@ interface NFT {
     name: string;
     url: string;
     duration: number;
+    side: string;
+    isrc?: string;
   }>;
   sideBTracks?: Array<{
     id: string;
     name: string;
     url: string;
     duration: number;
+    side: string;
+    isrc?: string;
   }>;
   currentOrders: number;
   targetOrders: number;

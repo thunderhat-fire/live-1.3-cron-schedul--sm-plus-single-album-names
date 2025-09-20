@@ -27,15 +27,15 @@ interface NFTProduct {
   isVinylPresale: boolean
   targetOrders: number
   currentOrders: number
-  viewCount: number
-  favoritesCount: number
+  viewCount?: number
+  favoritesCount?: number
   user: {
     name?: string
     image?: string
     id: string
   }
-  sideATracks: Track[]
-  sideBTracks: Track[]
+  sideATracks?: Track[]
+  sideBTracks?: Track[]
   presaleThreshold?: {
     status: string
     targetOrders: number
@@ -53,7 +53,8 @@ export default function ProductStructuredData({ nft }: ProductStructuredDataProp
 
     // Calculate availability and stock status
     const isPresaleCompleted = nft.presaleThreshold?.status === 'completed' || 
-                              (nft.presaleThreshold?.currentOrders >= nft.presaleThreshold?.targetOrders) ||
+                              (nft.presaleThreshold?.currentOrders && nft.presaleThreshold?.targetOrders && 
+                               nft.presaleThreshold.currentOrders >= nft.presaleThreshold.targetOrders) ||
                               (nft.currentOrders >= nft.targetOrders)
     const isPresaleTimeEnded = nft.endDate && new Date(nft.endDate) < new Date()
     const isAvailable = nft.isVinylPresale ? !isPresaleCompleted && !isPresaleTimeEnded : true
@@ -64,7 +65,7 @@ export default function ProductStructuredData({ nft }: ProductStructuredDataProp
 
     // Calculate ratings based on engagement
     const engagementScore = Math.min(5, Math.max(1, 
-      (nft.favoritesCount * 0.5 + nft.viewCount * 0.01) / 10
+      ((nft.favoritesCount || 0) * 0.5 + (nft.viewCount || 0) * 0.01) / 10
     ))
 
     const structuredData = {
@@ -139,11 +140,11 @@ export default function ProductStructuredData({ nft }: ProductStructuredDataProp
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": engagementScore.toFixed(1),
-        "ratingCount": Math.max(1, nft.favoritesCount),
+        "ratingCount": Math.max(1, nft.favoritesCount || 0),
         "bestRating": "5",
         "worstRating": "1"
       },
-      "review": nft.favoritesCount > 0 ? [{
+      "review": (nft.favoritesCount || 0) > 0 ? [{
         "@type": "Review",
         "reviewRating": {
           "@type": "Rating",
@@ -154,7 +155,7 @@ export default function ProductStructuredData({ nft }: ProductStructuredDataProp
           "@type": "Organization",
           "name": "VinylFunders Community"
         },
-        "reviewBody": `Highly rated by ${nft.favoritesCount} music enthusiasts on VinylFunders.`
+        "reviewBody": `Highly rated by ${nft.favoritesCount || 0} music enthusiasts on VinylFunders.`
       }] : undefined,
       "additionalProperty": [
         {
@@ -223,7 +224,7 @@ export default function ProductStructuredData({ nft }: ProductStructuredDataProp
 
     // Add availability details for presales
     if (nft.isVinylPresale && !isPresaleCompleted) {
-      structuredData.offers.advanceBookingRequirement = {
+      (structuredData.offers as any).advanceBookingRequirement = {
         "@type": "QuantitativeValue",
         "minValue": nft.currentOrders,
         "maxValue": nft.targetOrders,

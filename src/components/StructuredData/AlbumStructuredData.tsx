@@ -33,8 +33,8 @@ interface NFT {
     image?: string
     id: string
   }
-  sideATracks: Track[]
-  sideBTracks: Track[]
+  sideATracks?: Track[]
+  sideBTracks?: Track[]
 }
 
 interface AlbumStructuredDataProps {
@@ -151,7 +151,7 @@ export default function AlbumStructuredData({ nft }: AlbumStructuredDataProps) {
 
     // Add preview audio if available
     if (nft.previewAudioUrl) {
-      structuredData.audio = {
+      (structuredData as any).audio = {
         "@type": "AudioObject",
         "contentUrl": nft.previewAudioUrl,
         "encodingFormat": "audio/mpeg",

@@ -56,8 +56,8 @@ export default function ArtistStructuredData({ artist }: ArtistStructuredDataPro
     if (artist.tiktok) sameAs.push(artist.tiktok)
 
     // Determine artist type and genre based on albums
-    const genres = artist.nfts?.map(nft => nft.genre).filter(Boolean) || []
-    const uniqueGenres = [...new Set(genres)]
+    const genres = artist.nfts?.map(nft => nft.genre).filter((genre): genre is string => Boolean(genre)) || []
+    const uniqueGenres = Array.from(new Set(genres))
 
     const structuredData = {
       "@context": "https://schema.org",
@@ -142,7 +142,7 @@ export default function ArtistStructuredData({ artist }: ArtistStructuredDataPro
 
     // Add contact information if website is available
     if (artist.website || artist.email) {
-      structuredData.contactPoint = {
+      (structuredData as any).contactPoint = {
         "@type": "ContactPoint",
         "contactType": "fan mail",
         "email": artist.email,
