@@ -192,9 +192,15 @@ const Layout = ({ children }: { children: ReactNode }) => {
     <div className={`nc-AuthorPage`}>
       {userData && (
         <ArtistStructuredData artist={{
-          ...userData,
+          id: userData.id,
           name: userData.name || undefined, // Convert null to undefined
           email: userData.email,
+          image: userData.image || undefined,
+          bio: userData.bio || undefined,
+          website: userData.website || undefined,
+          facebook: userData.facebook || undefined,
+          twitter: userData.twitter || undefined,
+          tiktok: userData.tiktok || undefined,
           createdAt: new Date().toISOString(), // Fallback date
           updatedAt: new Date().toISOString(), // Fallback date  
           subscriptionTier: userData.subscriptionTier || 'starter',
