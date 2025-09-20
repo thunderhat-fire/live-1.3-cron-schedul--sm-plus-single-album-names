@@ -98,8 +98,7 @@ interface User {
   email: string;
 }
 
-// Export generateMetadata for Next.js
-export { generateMetadata } from './metadata';
+// Note: generateMetadata moved to layout.tsx for server-side generation
 
 const NftDetailPage = () => {
   const router = useRouter();

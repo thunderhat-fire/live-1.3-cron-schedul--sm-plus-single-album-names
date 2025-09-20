@@ -8,8 +8,7 @@ import Pagination from "@/shared/Pagination/Pagination";
 import { NFT } from "@/types";
 import { isPlusMember } from '@/utils/membership';
 
-// Export generateMetadata for Next.js
-export { generateMetadata } from './metadata';
+// Note: generateMetadata moved to layout.tsx for server-side generation
 
 export default function AuthorPage() {
   const paramsRaw = useParams() || {};
