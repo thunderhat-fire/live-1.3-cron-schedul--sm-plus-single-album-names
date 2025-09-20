@@ -1,0 +1,39 @@
+.card {
+  position: relative !important;
+  min-height: 300px !important;
+  border-radius: 24px !important;
+  padding: 20px !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  background-color: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.backgroundImage {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+}
+
+.overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  z-index: 2 !important;
+}
+
+.content {
+  position: relative !important;
+  z-index: 3 !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.card:hover {
+  transform: scale(1.02) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+} 

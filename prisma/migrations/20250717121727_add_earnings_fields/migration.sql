@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "digitalDownloadSalesPaid" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "presaleEarningsPaid" DOUBLE PRECISION NOT NULL DEFAULT 0;

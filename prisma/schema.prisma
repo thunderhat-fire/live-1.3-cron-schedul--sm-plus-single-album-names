@@ -1,0 +1,674 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       String                   @id @default(cuid())
+  email                    String                   @unique
+  name                     String?
+  password                 String
+  emailVerified            DateTime?
+  image                    String?
+  bio                      String?
+  website                  String?
+  facebook                 String?
+  twitter                  String?
+  tiktok                   String?
+  walletAddress            String?
+  recordLabel              String?                  @db.VarChar(255)
+  recordLabelImage         String?                  @db.VarChar(255)
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @updatedAt
+  isAdmin                  Boolean                  @default(false)
+  aiMasteringCredits       Int                      @default(0)
+  promotionalCredits       Float                    @default(0)
+  resetToken               String?                  @unique
+  resetTokenExpiry         DateTime?
+  subscriptionEndDate      DateTime?
+  subscriptionStatus       String                   @default("active")
+  subscriptionTier         String                   @default("starter")
+  role                     String                   @default("user")
+  albumsSentToFans         Int                      @default(0)
+  digitalDownloadSalesPaid Float                    @default(0)
+  presaleEarningsPaid      Float                    @default(0)
+  payAsYouGoCredits        Int                      @default(0)
+  stripeChargesEnabled     Boolean                  @default(false)
+  stripeConnectAccountId   String?
+  stripeOnboardingComplete Boolean                  @default(false)
+  stripeOnboardingUrl      String?
+  stripePayoutsEnabled     Boolean                  @default(false)
+  stripeTosAcceptance      DateTime?
+  abuseReports             AbuseReport[]
+  accounts                 Account[]
+  comments                 Comment[]
+  digitalDownloadRoyalties DigitalDownloadRoyalty[]
+  forumReplies             ForumReply[]
+  forumThreads             ForumThread[]
+  likes                    Like[]
+  masteringRequests        MasteringRequest[]
+  sentMessages             Message[]                @relation("SentMessages")
+  receivedMessages         Message[]                @relation("ReceivedMessages")
+  modLogs                  ModLog[]
+  nfts                     NFT[]
+  notifications            Notification[]
+  orders                   Order[]
+  playerEvents             PlayerEvent[]
+  posts                    Post[]
+  sessions                 Session[]
+  streams                  Stream[]
+  sentStreamMessages       StreamMessage[]          @relation("UserSentStreamMessages")
+  payAsYouGoPayments       PayAsYouGoPayment[]
+  User_A                   User[]                   @relation("UserFollows")
+  User_B                   User[]                   @relation("UserFollows")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Post {
+  id           String     @id @default(cuid())
+  title        String
+  content      String?
+  published    Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  slug         String     @unique
+  commentCount Int        @default(0)
+  authorId     String
+  viewCount    Int        @default(0)
+  comments     Comment[]
+  author       User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categories   Category[] @relation("PostCategories")
+  tags         Tag[]      @relation("PostTags")
+}
+
+model NFT {
+  id                       String                   @id @default(cuid())
+  name                     String
+  description              String?
+  externalLink             String?
+  royalties                String?
+  size                     String?
+  properties               String?
+  instantSalePrice         String?
+  isUnlockable             Boolean                  @default(false)
+  isInstantSale            Boolean                  @default(false)
+  genre                    String?
+  recordSize               String?
+  sideAImage               String?
+  sideBImage               String?
+  price                    Float                    @default(0)
+  endDate                  DateTime?
+  favoritesCount           Int                      @default(0)
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @updatedAt
+  userId                   String
+  recordLabel              String?
+  commentsCount            Int                      @default(0)
+  isCurated                Boolean                  @default(false)
+  viewCount                Int                      @default(0)
+  currentOrders            Int                      @default(100)
+  isVinylPresale           Boolean                  @default(true)
+  targetOrders             Int                      @default(100)
+  deletedAt                DateTime?
+  isDeleted                Boolean                  @default(false)
+  digitalNotificationSent  Boolean                  @default(false)
+  masterAudioUrl           String?
+  masteringNotes           String?
+  previewAudioUrl          String?
+  totalPressings           Int                      @default(0)
+  vinylSpecs               Json?
+  addressCity              String?
+  addressCountry           String?
+  addressName              String?
+  addressPostcode          String?
+  addressStreet            String?
+  isRadioEligible          Boolean                  @default(true)
+  lastRadioPlay            DateTime?
+  radioPlayCount           Int                      @default(0)
+  radioSampleEnd           Int                      @default(30)
+  radioSampleStart         Int                      @default(0)
+  brevoListId              Int?
+  abuseReports             AbuseReport[]
+  captureAttempts          CaptureAttempt[]
+  capturedPayments         CapturedPayment[]
+  digitalDownloadRoyalties DigitalDownloadRoyalty[]
+  likes                    Like[]
+  user                     User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders                   Order[]
+  playerEvents             PlayerEvent[]
+  playlistTracks           PlaylistTrack[]
+  presaleThreshold         PresaleThreshold?
+  sideATracks              Track[]                  @relation("SideATracks")
+  sideBTracks              Track[]                  @relation("SideBTracks")
+  vinylPressings           VinylPressing[]
+}
+
+model Track {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  duration  Int
+  side      String
+  nftAId    String?
+  nftBId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isrc      String?  @unique
+  nftA      NFT?     @relation("SideATracks", fields: [nftAId], references: [id])
+  nftB      NFT?     @relation("SideBTracks", fields: [nftBId], references: [id])
+
+  @@index([nftAId])
+  @@index([nftBId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  nftId     String
+  createdAt DateTime @default(now())
+  nft       NFT      @relation(fields: [nftId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, nftId])
+  @@index([userId])
+  @@index([nftId])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  fromUserId String
+  toUserId   String
+  fromUser   User     @relation("SentMessages", fields: [fromUserId], references: [id])
+  toUser     User     @relation("ReceivedMessages", fields: [toUserId], references: [id])
+
+  @@index([fromUserId])
+  @@index([toUserId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   @default("info")
+  isGlobal  Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  user      User     @relation(fields: [createdBy], references: [id])
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String
+  message   String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id                    String    @id @default(cuid())
+  userId                String?
+  nftId                 String
+  format                String
+  quantity              Int       @default(1)
+  totalPrice            Float
+  status                String    @default("pending")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  artistStripeAccountId String?
+  buyerCity             String?
+  buyerCountry          String?
+  buyerIP               String?
+  capturedAt            DateTime?
+  customerEmail         String?
+  customerName          String?
+  isPresaleOrder        Boolean   @default(false)
+  paymentIntentId       String?
+  paymentMethod         String?
+  paymentStatus         String    @default("pending")
+  platformFeeAmount     Float?
+  shippingAddress       String?
+  shippingCity          String?
+  shippingCountry       String?
+  shippingPostcode      String?
+  transferAmount        Float?
+  transferId            String?
+  transferStatus        String    @default("pending")
+  transferredAt         DateTime?
+  nft                   NFT       @relation(fields: [nftId], references: [id], onDelete: Cascade)
+  user                  User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([nftId])
+  @@index([status])
+  @@index([isPresaleOrder])
+  @@index([buyerCountry])
+  @@index([transferStatus])
+}
+
+model PlayerEvent {
+  id            String   @id @default(cuid())
+  userId        String?
+  nftId         String
+  eventType     String
+  playPosition  Int
+  trackDuration Int
+  sessionId     String
+  userAgent     String?
+  ipAddress     String?
+  createdAt     DateTime @default(now())
+  nft           NFT      @relation(fields: [nftId], references: [id], onDelete: Cascade)
+  user          User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([nftId])
+  @@index([eventType])
+  @@index([sessionId])
+  @@index([createdAt])
+}
+
+model VinylPressing {
+  id                      String           @id @default(cuid())
+  nftId                   String
+  status                  String           @default("pending")
+  vinylColor              String?
+  vinylWeight             Int?
+  labelInstructions       String?
+  quantity                Int
+  testPressing            Boolean          @default(false)
+  testPressingApproved    Boolean          @default(false)
+  pressingNotes           String?
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  productionBatch         String?
+  estimatedCompletionDate DateTime?
+  actualCompletionDate    DateTime?
+  qualityChecks           QualityCheck[]
+  shippingDetails         ShippingDetail[]
+  nft                     NFT              @relation(fields: [nftId], references: [id])
+
+  @@index([nftId])
+  @@index([status])
+}
+
+model QualityCheck {
+  id         String        @id @default(cuid())
+  pressingId String
+  checkType  String
+  status     String
+  notes      String?
+  checkedBy  String
+  checkedAt  DateTime      @default(now())
+  pressing   VinylPressing @relation(fields: [pressingId], references: [id])
+
+  @@index([pressingId])
+}
+
+model ShippingDetail {
+  id                String        @id @default(cuid())
+  pressingId        String
+  trackingNumber    String?
+  carrier           String?
+  status            String
+  estimatedDelivery DateTime?
+  actualDelivery    DateTime?
+  shippingAddress   String
+  shippingNotes     String?
+  pressing          VinylPressing @relation(fields: [pressingId], references: [id])
+
+  @@index([pressingId])
+  @@index([trackingNumber])
+}
+
+model ModLog {
+  id          String   @id @default(cuid())
+  action      String
+  targetId    String
+  targetType  String
+  details     String?
+  moderatorId String
+  createdAt   DateTime @default(now())
+  moderator   User     @relation(fields: [moderatorId], references: [id], onDelete: Cascade)
+
+  @@index([moderatorId])
+  @@index([targetId])
+  @@index([action])
+}
+
+model ForumCategory {
+  id          String        @id @default(cuid())
+  name        String
+  description String
+  slug        String        @unique
+  threadCount Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  threads     ForumThread[]
+
+  @@index([slug])
+}
+
+model ForumThread {
+  id         String        @id @default(cuid())
+  title      String
+  content    String
+  isPinned   Boolean       @default(false)
+  isLocked   Boolean       @default(false)
+  viewCount  Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  authorId   String
+  categoryId String
+  replies    ForumReply[]
+  author     User          @relation(fields: [authorId], references: [id])
+  category   ForumCategory @relation(fields: [categoryId], references: [id])
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([createdAt])
+}
+
+model ForumReply {
+  id        String      @id @default(cuid())
+  content   String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  authorId  String
+  threadId  String
+  author    User        @relation(fields: [authorId], references: [id])
+  thread    ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([threadId])
+  @@index([createdAt])
+}
+
+model MasteringRequest {
+  id               String   @id @default(cuid())
+  userId           String
+  originalTrackUrl String
+  masteredTrackUrl String?
+  status           String   @default("pending")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id])
+}
+
+model AbuseReport {
+  id        String   @id @default(cuid())
+  userId    String?
+  nftId     String?
+  type      String
+  message   String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  nft       NFT?     @relation(fields: [nftId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([nftId])
+}
+
+model DigitalDownloadRoyalty {
+  id     String   @id @default(cuid())
+  userId String
+  nftId  String
+  amount Float
+  date   DateTime @default(now())
+  nft    NFT      @relation(fields: [nftId], references: [id])
+  user   User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([nftId])
+}
+
+model Stream {
+  id          String          @id @default(cuid())
+  creatorId   String
+  title       String
+  status      String          @default("scheduled")
+  startedAt   DateTime        @default(now())
+  endedAt     DateTime?
+  channelName String?
+  createdAt   DateTime        @default(now())
+  token       String?
+  uid         Int?
+  updatedAt   DateTime        @updatedAt
+  likeCount   Int             @default(0)
+  shareCount  Int             @default(0)
+  viewCount   Int             @default(0)
+  creator     User            @relation(fields: [creatorId], references: [id])
+  messages    StreamMessage[]
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  postId    String
+  authorId  String
+  parentId  String?
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  posts Post[] @relation("PostCategories")
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  posts Post[] @relation("PostTags")
+}
+
+model StreamMessage {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  streamId  String
+  senderId  String
+  sender    User     @relation("UserSentStreamMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  stream    Stream   @relation(fields: [streamId], references: [id], onDelete: Cascade)
+
+  @@index([streamId])
+  @@index([senderId])
+}
+
+model RadioStream {
+  id                    String     @id @default(cuid())
+  name                  String
+  status                String     @default("inactive")
+  currentPlaylistId     String?
+  isLive                Boolean    @default(false)
+  youtubeStreamId       String?
+  lastUpdated           DateTime   @default(now())
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  currentTrackIndex     Int        @default(0)
+  currentTrackStartTime DateTime?
+  peakListeners         Int        @default(0)
+  totalListeners        Int        @default(0)
+  totalPlayTime         Int        @default(0)
+  playlists             Playlist[]
+  currentPlaylist       Playlist?  @relation("CurrentPlaylist", fields: [currentPlaylistId], references: [id])
+
+  @@index([status])
+  @@index([isLive])
+}
+
+model Playlist {
+  id                 String          @id @default(cuid())
+  name               String
+  status             String          @default("draft")
+  totalDuration      Int             @default(0)
+  trackCount         Int             @default(0)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  radioStreamId      String?
+  radioStream        RadioStream?    @relation(fields: [radioStreamId], references: [id])
+  tracks             PlaylistTrack[]
+  currentPlaylistFor RadioStream[]   @relation("CurrentPlaylist")
+
+  @@index([status])
+  @@index([radioStreamId])
+}
+
+model PlaylistTrack {
+  id          String    @id @default(cuid())
+  playlistId  String
+  nftId       String?
+  position    Int
+  ttsAudioId  String?
+  sampleStart Int       @default(0)
+  sampleEnd   Int       @default(30)
+  duration    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  isAd        Boolean   @default(false)
+  ttsAudioUrl String?
+  isIntro     Boolean   @default(false)
+  trackTitle  String?   // Track title for radio display
+  audioUrl    String?   // Direct audio URL for playback
+  nft         NFT?      @relation(fields: [nftId], references: [id])
+  playlist    Playlist  @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  ttsAudio    TTSAudio? @relation(fields: [ttsAudioId], references: [id])
+
+  @@unique([playlistId, position])
+  @@index([playlistId])
+  @@index([nftId])
+}
+
+model TTSAudio {
+  id             String          @id @default(cuid())
+  text           String
+  voiceId        String
+  audioUrl       String
+  duration       Int             @default(0)
+  status         String          @default("processing")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  playlistTracks PlaylistTrack[]
+
+  @@index([status])
+  @@index([voiceId])
+}
+
+model CaptureAttempt {
+  id                 String    @id @default(cuid())
+  nftId              String
+  attemptNumber      Int       @default(1)
+  totalOrders        Int       @default(0)
+  successfulCaptures Int       @default(0)
+  failedCaptures     Int       @default(0)
+  status             String    @default("in_progress")
+  createdAt          DateTime  @default(now())
+  completedAt        DateTime?
+  nft                NFT       @relation(fields: [nftId], references: [id])
+
+  @@index([nftId])
+  @@index([status])
+}
+
+model CapturedPayment {
+  id              String    @id @default(cuid())
+  paymentIntentId String    @unique
+  nftId           String
+  amount          Float
+  status          String    @default("pending")
+  processedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  nft             NFT       @relation(fields: [nftId], references: [id])
+
+  @@index([nftId])
+  @@index([status])
+  @@index([paymentIntentId])
+}
+
+model PresaleThreshold {
+  id            String   @id @default(cuid())
+  nftId         String   @unique
+  targetOrders  Int
+  currentOrders Int      @default(0)
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  nft           NFT      @relation(fields: [nftId], references: [id])
+
+  @@index([nftId])
+  @@index([status])
+}
+
+model PayAsYouGoPayment {
+  id              String    @id @default(cuid())
+  userId          String
+  amount          Float
+  paymentIntentId String    @unique
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([paymentIntentId])
+}

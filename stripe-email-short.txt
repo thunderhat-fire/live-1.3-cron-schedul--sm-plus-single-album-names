@@ -1,0 +1,40 @@
+Subject: VinylFunders - Business Model Clarification (Not Crowdfunding)
+
+Dear Stripe Support,
+
+I'm writing to clarify VinylFunders' business model following concerns about crowdfunding compliance.
+
+VinylFunders is a legitimate music marketplace specializing in vinyl pre-orders, NOT a crowdfunding platform. Key distinctions:
+
+**Our Business Model:**
+• Vinyl pre-orders with guaranteed manufacturing (similar to Bandcamp, Qrates)
+• Fixed pricing - customers know exactly what they're purchasing
+• Established manufacturing partnerships with verified pressing plants
+• Standard industry practice for vinyl production (8-12 week manufacturing cycle)
+
+**Payment Processing:**
+• Use Stripe's authorization/capture model (standard e-commerce practice)
+• Payments authorized immediately, captured only when manufacturing begins
+• Automatic refunds if minimum quantities aren't met (100/200/500 units)
+• Maximum 90-day authorization period (within Stripe guidelines)
+
+**Compliance & Protection:**
+• Registered business with proper licensing
+• Professional order fulfillment and customer service
+• Clear terms of service and transparent pricing
+• PCI DSS compliant with proper security measures
+• Established dispute resolution processes
+
+**Key Differentiators from Crowdfunding:**
+• No speculative projects - only confirmed, producible albums
+• No variable funding goals or backer rewards
+• Professional manufacturing timelines, not uncertain project delivery
+• Fixed product pricing with guaranteed delivery
+
+VinylFunders operates identically to established platforms like Bandcamp and Qrates, which successfully process millions in vinyl pre-orders annually. We're committed to maintaining the highest compliance standards and can provide any additional documentation needed.
+
+Thank you for your consideration.
+
+Best regards,
+[Your Name]
+[Contact Information] 
