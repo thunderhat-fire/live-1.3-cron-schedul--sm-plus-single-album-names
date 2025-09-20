@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // Build artist metadata
     const artistName = user.name || 'Independent Artist'
     const albumCount = user.nfts?.length || 0
-    const genres = [...new Set(user.nfts?.map(nft => nft.genre).filter(Boolean))] || []
+    const genres = Array.from(new Set(user.nfts?.map(nft => nft.genre).filter(Boolean))) || []
     const totalViews = user.nfts?.reduce((sum, nft) => sum + (nft.viewCount || 0), 0) || 0
     const totalLikes = user.nfts?.reduce((sum, nft) => sum + (nft.favoritesCount || 0), 0) || 0
     
