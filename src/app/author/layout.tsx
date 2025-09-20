@@ -193,6 +193,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       {userData && (
         <ArtistStructuredData artist={{
           ...userData,
+          name: userData.name || undefined, // Convert null to undefined
           email: userData.email,
           createdAt: new Date().toISOString(), // Fallback date
           updatedAt: new Date().toISOString(), // Fallback date  
