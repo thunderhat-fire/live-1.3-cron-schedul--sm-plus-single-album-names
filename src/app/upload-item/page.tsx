@@ -14,9 +14,9 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 
-const MAX_TRACKS_12_INCH = 5;
+const MAX_TRACKS_12_INCH = 5; // 5 tracks per side for 12-inch vinyl
 const MAX_DURATION_12_INCH = 22 * 60; // 22 minutes in seconds
-const MAX_TRACKS_7_INCH = 2;
+const MAX_TRACKS_7_INCH = 2; // 2 tracks per side for 7-inch vinyl  
 const MAX_DURATION_7_INCH = 4 * 60; // 4 minutes in seconds
 
 interface AudioTrack {
@@ -300,16 +300,21 @@ const PageUploadItem = () => {
 
 
   const getTrackLimits = () => {
-    if (formData.recordSize === '7 inch') {
+    // Ensure string comparison is case-insensitive and trim whitespace
+    const recordSize = formData.recordSize?.trim().toLowerCase();
+    
+    if (recordSize === '7 inch') {
       return {
         maxTracks: MAX_TRACKS_7_INCH,
         maxDuration: MAX_DURATION_7_INCH,
         maxDurationMinutes: 4
       };
     }
+    
+    // Default to 12-inch limits for '12 inch' or any other value (including empty)
     return {
-      maxTracks: MAX_TRACKS_12_INCH,
-      maxDuration: MAX_DURATION_12_INCH,
+      maxTracks: MAX_TRACKS_12_INCH, // Should be 5 tracks
+      maxDuration: MAX_DURATION_12_INCH, // Should be 22 minutes
       maxDurationMinutes: 22
     };
   };
@@ -535,10 +540,15 @@ const PageUploadItem = () => {
 
       // Get current limits based on record size
       const limits = getTrackLimits();
-
+      
       // Check if adding this track would exceed the side's track limit
       const currentSide = formData[side];
-      if (currentSide.tracks.length >= limits.maxTracks) {
+      // Count only tracks that actually have files (not empty slots)
+      const tracksWithFiles = currentSide.tracks.filter(track => track.file !== null).length;
+      
+      // Debug logging
+      console.log(`handleAudioTrackChange - Record Size: "${formData.recordSize}", maxTracks: ${limits.maxTracks}, total slots: ${currentSide.tracks.length}, tracks with files: ${tracksWithFiles}`);
+      if (tracksWithFiles >= limits.maxTracks) {
         throw new Error(`Cannot add track: Side ${side === 'sideA' ? 'A' : 'B'} already has maximum number of tracks (${limits.maxTracks})`);
       }
 
@@ -878,6 +888,9 @@ const PageUploadItem = () => {
     const { maxTracks, maxDurationMinutes } = getTrackLimits();
     const sideData = formData[side];
     const tracks = sideData.tracks;
+    
+    // Debug logging to help identify the issue
+    console.log(`renderVinylSide - Side: ${side}, Record Size: "${formData.recordSize}", maxTracks: ${maxTracks}, current tracks: ${tracks.length}`);
 
     return (
       <div className="space-y-6">
