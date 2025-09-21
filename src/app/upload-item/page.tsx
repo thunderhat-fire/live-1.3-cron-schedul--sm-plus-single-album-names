@@ -632,9 +632,9 @@ const PageUploadItem = () => {
       console.log('Submitting form data:', formData); // Debug
       
       // Calculate pre-sale end date
-      // Default: 0.05 days (1.2 hours), Gold tier extension: 0.05 days (1.2 hours)
+      // Default: 20 days, Gold tier extension: 28 days (4 weeks)
       const endDate = new Date();
-      const presaleDays = formData.extendPresaleToFourWeeks ? 0.05 : 0.05;
+      const presaleDays = formData.extendPresaleToFourWeeks ? 28 : 20;
       endDate.setTime(endDate.getTime() + (presaleDays * 24 * 60 * 60 * 1000));
       
       const price = formData.recordSize === '7inch' ? 21 : 22;
