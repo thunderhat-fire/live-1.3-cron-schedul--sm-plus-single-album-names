@@ -55,6 +55,27 @@ export async function GET() {
 
     console.log('Record labels found:', transformedRecordLabels.length);
     console.log('Record labels:', transformedRecordLabels.map(r => ({ name: r.name, count: r.count })));
+    
+    // Debug: Show all NFTs that should be included but might be filtered out
+    const debugNFTs = await prisma.nFT.findMany({
+      include: {
+        user: {
+          select: {
+            name: true,
+            subscriptionTier: true,
+            subscriptionStatus: true
+          }
+        }
+      },
+      where: {
+        isDeleted: false
+      }
+    });
+    
+    console.log('DEBUG: All non-deleted NFTs and their user info:');
+    debugNFTs.forEach(nft => {
+      console.log(`- NFT "${nft.name}" by ${nft.user?.name} (tier: ${nft.user?.subscriptionTier}, status: ${nft.user?.subscriptionStatus}, recordLabel: ${nft.recordLabel})`);
+    });
 
     return NextResponse.json({
       success: true,
