@@ -1208,7 +1208,7 @@ const PageUploadItem = () => {
                 value={formData.targetOrders}
                 onChange={(e) => {
                   const target = parseInt(e.target.value);
-                  let price;
+                  let price: number;
                   
                   // Different pricing for 7-inch vs 12-inch records
                   if (formData.recordSize === '7 inch') {
