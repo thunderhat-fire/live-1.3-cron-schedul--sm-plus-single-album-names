@@ -39,7 +39,7 @@ interface NFT {
   creator: string;
   userImage: string;
   creatorSubscriptionTier?: string;
-  recordSize: '7inch' | '12inch';
+  recordSize: '7 inch' | '12 inch';
   recordLabel?: string;
   price: number;
   digitalPrice?: number;
@@ -166,7 +166,7 @@ const NftDetailPage = () => {
     if (!nft?.isVinylPresale) return 13;
     
     // Check record size for pricing
-    if (nft.recordSize === '7inch' || nft.recordSize === '7 inch') {
+    if (nft.recordSize === '7 inch') {
       return 13; // Fixed price for 7-inch records
     }
     

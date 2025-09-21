@@ -34,7 +34,7 @@ const SmallNftCard: React.FC<SmallNftCardProps> = ({ nft }) => {
     if (nft.showAsDigital || !nft.isVinylPresale) return 13;
     
     // Check record size for pricing
-    if (nft.recordSize === '7inch' || nft.recordSize === '7 inch') {
+    if (nft.recordSize === '7 inch') {
       return 13; // Fixed price for 7-inch records
     }
     
