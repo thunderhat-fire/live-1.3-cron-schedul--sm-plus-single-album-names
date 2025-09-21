@@ -162,8 +162,15 @@ const NftDetailPage = () => {
     // If presale is completed, only digital is available at £13
     if (isVinylPresaleComplete) return 13;
     
-    // Otherwise use vinyl presale pricing based on target orders
-    if (!nft?.isVinylPresale) return 13; // If not a presale, always digital price
+    // If not a presale, always digital price
+    if (!nft?.isVinylPresale) return 13;
+    
+    // Check record size for pricing
+    if (nft.recordSize === '7inch' || nft.recordSize === '7 inch') {
+      return 13; // Fixed price for 7-inch records
+    }
+    
+    // 12-inch tiered pricing based on target orders
     if (nft.targetOrders === 100) return 26;
     if (nft.targetOrders === 200) return 22;
     if (nft.targetOrders === 500) return 20;
@@ -487,12 +494,12 @@ const NftDetailPage = () => {
     if (!nft) return 'Price: £0';
     
     if (!isVinylPresaleComplete && nft.isVinylPresale) {
-      return `Vinyl Pre-sale Price: £${formatPrice(nft.price)}`;
+      return `Vinyl Pre-sale Price: £${formatPrice(getCurrentPrice())}`;
     } else if (isDigitalAvailable) {
-      const digitalPrice = nft.digitalPrice || (nft.price ? parseFloat(nft.price.toString()) / 2 : 0);
+      const digitalPrice = 13; // Always £13 for digital
       return `Digital Edition Price: £${formatPrice(digitalPrice)}`;
     }
-    return `Price: £${formatPrice(nft.price)}`;
+    return `Price: £${formatPrice(getCurrentPrice())}`;
   };
 
   // Update pagination display

@@ -39,10 +39,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const isPresaleTimeEnded = nft.endDate && new Date(nft.endDate) < new Date()
     const showAsDigital = nft.isVinylPresale ? (isPresaleCompleted || isPresaleTimeEnded) : true
     
-    // Calculate pricing
-    let vinylPrice = 26
-    if (nft.targetOrders === 200) vinylPrice = 22
-    if (nft.targetOrders === 500) vinylPrice = 20
+    // Calculate pricing based on record size
+    let vinylPrice: number
+    if (nft.recordSize === '7 inch') {
+      vinylPrice = 13 // Fixed price for 7-inch records
+    } else {
+      // 12-inch tiered pricing
+      vinylPrice = 26
+      if (nft.targetOrders === 200) vinylPrice = 22
+      if (nft.targetOrders === 500) vinylPrice = 20
+    }
     
     const price = showAsDigital ? '13.00' : vinylPrice.toString()
     const formatType = showAsDigital ? 'Digital Edition' : 'Vinyl Presale'
