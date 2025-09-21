@@ -301,7 +301,7 @@ const PageUploadItem = () => {
   // Update price when record size changes
   useEffect(() => {
     if (formData.recordSize) {
-      let newPrice;
+      let newPrice: number;
       if (formData.recordSize === '7 inch') {
         newPrice = 13; // Fixed price for 7-inch
       } else {
