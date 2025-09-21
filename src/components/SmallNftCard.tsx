@@ -21,6 +21,7 @@ interface SmallNftCardProps {
     currentOrders?: number;
     targetOrders?: number;
     isVinylPresale?: boolean;
+    showAsDigital?: boolean;
     isLiked?: boolean;
     likeCount?: number;
     viewCount?: number;
