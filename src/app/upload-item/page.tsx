@@ -200,6 +200,7 @@ const PageUploadItem = () => {
   const countWords = (str: string) => str.trim().split(/\s+/).filter(Boolean).length;
 
   console.log("Form Data:", formData); // Debug form data
+  console.log("Record Size:", formData.recordSize, "Price:", formData.price); // Debug pricing
   console.log("Tracks Side A:", formData.sideA.tracks); // Debug Side A tracks
   console.log("Tracks Side B:", formData.sideB.tracks); // Debug Side B tracks
 
@@ -297,7 +298,26 @@ const PageUploadItem = () => {
     }
   }, [searchParams, update]);
 
-
+  // Update price when record size changes
+  useEffect(() => {
+    if (formData.recordSize) {
+      let newPrice;
+      if (formData.recordSize === '7 inch') {
+        newPrice = 13; // Fixed price for 7-inch
+      } else {
+        // 12-inch tiered pricing
+        newPrice = 26;
+        if (formData.targetOrders === 200) newPrice = 22;
+        if (formData.targetOrders === 500) newPrice = 20;
+      }
+      
+      console.log(`Updating price: recordSize=${formData.recordSize}, targetOrders=${formData.targetOrders}, newPrice=${newPrice}`);
+      
+      if (formData.price !== newPrice) {
+        setFormData(prev => ({ ...prev, price: newPrice }));
+      }
+    }
+  }, [formData.recordSize, formData.targetOrders]);
 
   const getTrackLimits = () => {
     // Ensure string comparison is case-insensitive and trim whitespace
@@ -637,7 +657,7 @@ const PageUploadItem = () => {
       const presaleDays = formData.extendPresaleToFourWeeks ? 28 : 20;
       endDate.setTime(endDate.getTime() + (presaleDays * 24 * 60 * 60 * 1000));
       
-      const price = formData.recordSize === '7inch' ? 21 : 22;
+      const price = formData.recordSize === '7 inch' ? 13 : 22;
       // ...track upload logic as before...
       const trackUploadPromises = [
         ...formData.sideA.tracks.map(async (track) => {
@@ -1183,24 +1203,59 @@ const PageUploadItem = () => {
             <div className="form-group col-span-12">
               <Label>Target Order Quantity</Label>
               <select
+                key={formData.recordSize} // Force re-render when record size changes
                 className="block w-full text-sm rounded-lg border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:border-neutral-700 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-900"
                 value={formData.targetOrders}
                 onChange={(e) => {
                   const target = parseInt(e.target.value);
-                  let price = 26;
-                  if (target === 200) price = 22;
-                  if (target === 500) price = 20;
+                  let price;
+                  
+                  // Different pricing for 7-inch vs 12-inch records
+                  if (formData.recordSize === '7 inch') {
+                    // 7-inch pricing
+                    price = 13; // Fixed price for 7-inch regardless of quantity
+                  } else {
+                    // 12-inch pricing (tiered)
+                    price = 26;
+                    if (target === 200) price = 22;
+                    if (target === 500) price = 20;
+                  }
+                  
                   setFormData({ ...formData, targetOrders: target, price });
                 }}
               >
-                <option value={100}>100 Records @ PreSale price of £26 per unit</option>
-                <option value={200}>200 Records @ PreSale price of £22 per unit</option>
-                <option value={500}>500 Records @ PreSale price of £20 per unit</option>
+                {formData.recordSize === '7 inch' ? (
+                  // 7-inch options - fixed price
+                  <>
+                    <option value={100}>100 Records @ PreSale price of £13 per unit</option>
+                    <option value={200}>200 Records @ PreSale price of £13 per unit</option>
+                    <option value={500}>500 Records @ PreSale price of £13 per unit</option>
+                  </>
+                ) : (
+                  // 12-inch options - tiered pricing
+                  <>
+                    <option value={100}>100 Records @ PreSale price of £26 per unit</option>
+                    <option value={200}>200 Records @ PreSale price of £22 per unit</option>
+                    <option value={500}>500 Records @ PreSale price of £20 per unit</option>
+                  </>
+                )}
               </select>
-              <div className="mt-2 text-green-700 text-sm font-medium">
-                {formData.targetOrders === 100 && 'You will be paid £260 on successful presale completion - minus any orders that can\'t be processed'}
-                {formData.targetOrders === 200 && 'You will be paid £750 on successful presale completion - minus any orders that can\'t be processed'}
-                {formData.targetOrders === 500 && 'You will be paid £3000 on successful presale completion - minus any orders that can\'t be processed'}
+              <div key={`payout-${formData.recordSize}-${formData.targetOrders}`} className="mt-2 text-green-700 text-sm font-medium">
+                {formData.recordSize === '7 inch' ? (
+                  // 7-inch payouts (net artist earnings after platform fees)
+                  <>
+                    {formData.targetOrders === 100 && 'You will be paid £175 on successful presale completion - minus any orders that can\'t be processed'}
+                    {formData.targetOrders === 200 && 'You will be paid £350 on successful presale completion - minus any orders that can\'t be processed'}
+                    {formData.targetOrders === 500 && 'You will be paid £875 on successful presale completion - minus any orders that can\'t be processed'}
+                  </>
+                ) : (
+                  // 12-inch payouts (net artist earnings after platform fees)
+                  <>
+                    {formData.targetOrders === 100 && 'You will be paid £260 on successful presale completion - minus any orders that can\'t be processed'}
+                    {formData.targetOrders === 200 && 'You will be paid £750 on successful presale completion - minus any orders that can\'t be processed'}
+                    {formData.targetOrders === 500 && 'You will be paid £3000 on successful presale completion - minus any orders that can\'t be processed'}
+                  </>
+                )}
               </div>
               <div className="mt-1">
                 <a href="/help-center" className="text-primary-600 hover:underline text-sm">Read more in our FAQ</a>
