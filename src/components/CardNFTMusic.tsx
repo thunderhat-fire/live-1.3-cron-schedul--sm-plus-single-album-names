@@ -64,8 +64,24 @@ const CardNFTMusic: FC<CardNFTMusicProps> = ({
 
   const stockCount = getCurrentOrders();
 
-  // Use backend price directly
-  const displayPrice = typeof nft.price === 'number' ? nft.price.toFixed(2) : nft.price;
+  // Calculate correct price based on record size and presale status
+  const getCorrectPrice = () => {
+    // If presale is completed or showing as digital, always £13
+    if (nft.showAsDigital || !nft.isVinylPresale) return 13;
+    
+    // Check record size for pricing
+    if (nft.recordSize === '7inch' || nft.recordSize === '7 inch') {
+      return 13; // Fixed price for 7-inch records
+    }
+    
+    // 12-inch tiered pricing based on target orders
+    if (nft.targetOrders === 100) return 26;
+    if (nft.targetOrders === 200) return 22;
+    if (nft.targetOrders === 500) return 20;
+    return 26; // Default to 26 if not matched
+  };
+
+  const displayPrice = getCorrectPrice().toFixed(2);
 
   // Get the best available image for Side A
   const getSideAImage = () => {
