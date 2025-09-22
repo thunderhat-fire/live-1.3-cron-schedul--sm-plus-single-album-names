@@ -51,78 +51,6 @@ export default function FooterRadioPlayer() {
     setImageLoadError(null);
   };
 
-  // Search functionality
-  const filteredTracks = Array.isArray(radioState.playlist) ? radioState.playlist.filter(track => {
-    if (!searchQuery.trim()) return false;
-    const query = searchQuery.toLowerCase();
-    
-    // Handle both raw track data and transformed data structures
-    const trackName = (
-      track.name || 
-      track.trackTitle || 
-      (track as any)?.nft?.name ||
-      ''
-    ).toLowerCase();
-    
-    const artistName = (
-      track.artist ||
-      track.recordLabel ||
-      (track as any)?.nft?.user?.name ||
-      ''
-    ).toLowerCase();
-
-    // Also check the album name and any additional track fields
-    const albumName = (
-      track.albumName ||
-      (track as any)?.nft?.name ||
-      ''
-    ).toLowerCase();
-
-    // Check if this is the current track and use its full details
-    const isCurrentTrack = track.id === radioState.currentTrack?.id;
-    const currentTrackFullName = isCurrentTrack ? (radioState.currentTrack?.name || '').toLowerCase() : '';
-    
-    const matches = trackName.includes(query) || 
-                   artistName.includes(query) || 
-                   albumName.includes(query) ||
-                   currentTrackFullName.includes(query);
-    
-    // Optional: Enable detailed track matching debug by uncommenting below
-    // if (searchQuery.trim().length > 0) {
-    //   console.log('🔍 Track check:', { id: track.id, trackName, artistName, matches });
-    // }
-    
-    return matches;
-  }) : [];
-
-  // Optional: Enable search results summary by uncommenting below
-  // if (searchQuery.trim().length > 0) {
-  //   console.log(`🔍 Search "${searchQuery}" found ${filteredTracks.length} matches`);
-  // }
-
-  // Jump to selected track
-  const handleTrackSelect = async (track: any) => {
-    const trackIndex = radioState.playlist?.findIndex(t => t.id === track.id);
-    if (trackIndex !== undefined && trackIndex !== -1) {
-      console.log('🎵 Jumping to track index:', trackIndex, track);
-      await setCurrentTrackByIndex(trackIndex);
-    }
-    setSearchQuery('');
-    setShowSearchResults(false);
-  };
-
-  // Handle search input
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    setShowSearchResults(value.trim().length > 0);
-    
-    // Optional: Enable debug logging by uncommenting the lines below
-    // if (value.trim().length > 0) {
-    //   console.log('🔍 Search query:', value);
-    //   console.log('🔍 Playlist length:', radioState.playlist?.length || 0);
-    // }
-  };
 
   // Debug logging
   console.log('🎵 FooterPlayer render:', {
@@ -133,15 +61,11 @@ export default function FooterRadioPlayer() {
     isPlaying: radioState.isPlaying,
     isLoading: radioState.isLoading,
     fullTrackObject: radioState.currentTrack,
-    searchQuery,
-    filteredTracksCount: filteredTracks.length,
-    showSearchResults,
-    playlistLength: Array.isArray(radioState.playlist) ? radioState.playlist.length : 0,
-    fullPlaylist: Array.isArray(radioState.playlist) ? radioState.playlist : []
+    playlistLength: Array.isArray(radioState.playlist) ? radioState.playlist.length : 0
   });
 
   // Log all track names for debugging (only once)
-  if (Array.isArray(radioState.playlist) && radioState.playlist.length > 0 && !searchQuery) {
+  if (Array.isArray(radioState.playlist) && radioState.playlist.length > 0) {
     console.log('🎵 All track names in playlist:');
     radioState.playlist.forEach((track, index) => {
       console.log(`  ${index}: "${track.name}" by "${track.artist}" (ID: ${track.id})`);
