@@ -346,6 +346,37 @@ export async function POST(request: Request) {
       // Don't fail the entire request if email fails
     }
 
+    // Sync with Google Merchant Center
+    try {
+      console.log('🛍️ Syncing NFT with Google Merchant Center:', result.nft.id);
+      
+      // Make internal API call to sync the product
+      const merchantResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/google-merchant/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nftId: result.nft.id,
+          action: 'sync'
+        }),
+      });
+
+      if (merchantResponse.ok) {
+        const merchantResult = await merchantResponse.json();
+        if (merchantResult.success) {
+          console.log('✅ NFT synced to Google Merchant Center successfully');
+        } else {
+          console.log('⚠️ Google Merchant Center sync failed:', merchantResult.error);
+        }
+      } else {
+        console.log('⚠️ Google Merchant Center sync request failed:', merchantResponse.status);
+      }
+    } catch (merchantError) {
+      console.error('❌ Failed to sync with Google Merchant Center:', merchantError);
+      // Don't fail the entire request if Google Merchant sync fails
+    }
+
     return NextResponse.json({
       success: true,
       nft: result.nft,
