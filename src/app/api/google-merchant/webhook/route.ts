@@ -68,27 +68,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function to trigger webhook (can be called from other parts of the app)
-export async function triggerGoogleMerchantWebhook(nftId: string, event: string, data?: any) {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/google-merchant/webhook`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        nftId,
-        event,
-        data,
-      }),
-    });
-
-    if (response.ok) {
-      console.log(`✅ Google Merchant webhook triggered: ${event} for NFT ${nftId}`);
-    } else {
-      console.error(`❌ Failed to trigger Google Merchant webhook: ${event} for NFT ${nftId}`);
-    }
-  } catch (error) {
-    console.error('Error triggering Google Merchant webhook:', error);
-  }
-}
