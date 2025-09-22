@@ -8,7 +8,6 @@ import {
   BackwardIcon,
   SpeakerWaveIcon,
   SpeakerXMarkIcon,
-  MagnifyingGlassIcon
 } from '@heroicons/react/24/solid';
 
 export default function FooterRadioPlayer() {
@@ -24,8 +23,6 @@ export default function FooterRadioPlayer() {
 
   const [imageLoadError, setImageLoadError] = useState<string | null>(null);
   const [imageKey, setImageKey] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchResults, setShowSearchResults] = useState(false);
 
   // Force image refresh when current track changes
   useEffect(() => {
@@ -193,39 +190,8 @@ export default function FooterRadioPlayer() {
           </div>
         </div>
 
-        {/* Search Bar - Center (responsive width) */}
-        <div className="flex items-center relative flex-1 sm:flex-none">
-          <div className="relative w-full sm:w-auto">
-            <MagnifyingGlassIcon className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Album/Author"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 w-full sm:w-40 lg:w-48 text-sm bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-            />
-            
-            {/* Search Results Dropdown - Positioned above search bar */}
-            {showSearchResults && filteredTracks.length > 0 && (
-              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-64 overflow-y-auto z-50">
-                {filteredTracks.slice(0, 10).map((track) => (
-                  <button
-                    key={track.id}
-                    onClick={() => handleTrackSelect(track)}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-neutral-700 border-b border-gray-100 dark:border-gray-600 last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
-                  >
-                    <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {track.name || track.trackTitle || (track as any)?.nft?.name || 'Unknown Track'}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {track.artist || track.recordLabel || (track as any)?.nft?.user?.name || 'Unknown Artist'}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Spacer - Center */}
+        <div className="flex-1"></div>
 
         {/* Controls - Right Side (simplified on mobile) */}
         <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
