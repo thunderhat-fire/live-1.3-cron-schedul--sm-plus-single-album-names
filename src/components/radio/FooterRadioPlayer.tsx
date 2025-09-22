@@ -4,8 +4,6 @@ import { useRadio } from '@/contexts/RadioContext';
 import { 
   PlayIcon, 
   PauseIcon, 
-  ForwardIcon,
-  BackwardIcon,
   SpeakerWaveIcon,
   SpeakerXMarkIcon,
 } from '@heroicons/react/24/solid';
@@ -195,20 +193,6 @@ export default function FooterRadioPlayer() {
 
         {/* Controls - Right Side (simplified on mobile) */}
         <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-          {/* Previous Track - hidden on mobile */}
-          <button
-            onClick={() => {
-              console.log('🎵 FooterPlayer: Previous button clicked');
-              console.log('🎵 Playlist length:', radioState.playlist?.length || 0);
-              console.log('🎵 Current index:', radioState.currentTrackIndex);
-              goToPreviousTrack();
-            }}
-            className="hidden sm:block p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            disabled={radioState.isLoading || !Array.isArray(radioState.playlist) || radioState.playlist.length <= 1}
-            title="Previous Track"
-          >
-            <BackwardIcon className="w-5 h-5" />
-          </button>
 
           {/* Play/Pause */}
           <button
@@ -225,20 +209,6 @@ export default function FooterRadioPlayer() {
             )}
           </button>
 
-          {/* Next Track - hidden on mobile */}
-          <button
-            onClick={() => {
-              console.log('🎵 FooterPlayer: Next button clicked');
-              console.log('🎵 Playlist length:', radioState.playlist?.length || 0);
-              console.log('🎵 Current index:', radioState.currentTrackIndex);
-              advanceToNextTrack();
-            }}
-            className="hidden sm:block p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            disabled={radioState.isLoading || !Array.isArray(radioState.playlist) || radioState.playlist.length <= 1}
-            title="Next Track"
-          >
-            <ForwardIcon className="w-5 h-5" />
-          </button>
 
           {/* Volume Control - simplified on mobile */}
           <div className="flex items-center space-x-1 sm:space-x-2">
