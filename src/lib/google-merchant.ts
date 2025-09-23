@@ -22,7 +22,7 @@ interface GoogleMerchantProduct {
   title: string;
   description: string;
   link: string;
-  image_link: string;  // Changed from imageLink to image_link
+  imageLink: string;  // Keep camelCase - this appears to be correct
   availability: 'in stock' | 'out of stock' | 'preorder';
   price: {
     value: string;
@@ -31,13 +31,13 @@ interface GoogleMerchantProduct {
   gtin?: string;
   brand: string;
   condition: 'new' | 'refurbished' | 'used';
-  google_product_category: string;  // Changed from googleProductCategory to google_product_category
-  product_type: string;  // Changed from productType to product_type
-  custom_label_0?: string; // Genre - Changed from customLabel0 to custom_label_0
-  custom_label_1?: string; // Record Size - Changed from customLabel1 to custom_label_1
-  custom_label_2?: string; // Artist Tier - Changed from customLabel2 to custom_label_2
-  custom_label_3?: string; // Presale Status - Changed from customLabel3 to custom_label_3
-  custom_label_4?: string; // Target Orders - Changed from customLabel4 to custom_label_4
+  googleProductCategory: string;  // Keep camelCase - this appears to be correct  
+  productType?: string;  // Keep camelCase and make optional
+  customLabel0?: string; // Genre - Keep camelCase
+  customLabel1?: string; // Record Size - Keep camelCase
+  customLabel2?: string; // Artist Tier - Keep camelCase
+  customLabel3?: string; // Presale Status - Keep camelCase
+  customLabel4?: string; // Target Orders - Keep camelCase
 }
 
 class GoogleMerchantService {
@@ -97,7 +97,7 @@ class GoogleMerchantService {
       title: title.substring(0, 150), // Google limit
       description: enhancedDescription.substring(0, 5000), // Google limit
       link: `${this.baseUrl}/nft-detail/${id}`,
-      image_link: sideAImage || imageUrl,
+      imageLink: sideAImage || imageUrl,
       availability,
       price: {
         value: price.toString(),
@@ -105,13 +105,14 @@ class GoogleMerchantService {
       },
       brand: 'VinylFunders',
       condition: 'new',
-      google_product_category: '55', // Media > Music
-      product_type: 'Music > Vinyl Records > Independent Artists',
-      custom_label_0: genre || 'Music',
-      custom_label_1: recordSize,
-      custom_label_2: 'Independent', // Could be dynamic based on artist tier
-      custom_label_3: isVinylPresale ? 'Presale' : 'Digital',
-      custom_label_4: `${currentOrders}/${targetOrders}`,
+      googleProductCategory: '55', // Media > Music
+      // Remove optional fields that are causing validation errors
+      // productType: 'Music > Vinyl Records > Independent Artists',
+      // customLabel0: genre || 'Music',
+      // customLabel1: recordSize,
+      // customLabel2: 'Independent',
+      // customLabel3: isVinylPresale ? 'Presale' : 'Digital',
+      // customLabel4: `${currentOrders}/${targetOrders}`,
     };
   }
 
