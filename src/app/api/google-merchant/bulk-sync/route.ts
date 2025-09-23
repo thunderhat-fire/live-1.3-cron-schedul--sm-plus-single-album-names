@@ -35,9 +35,13 @@ export async function POST(request: NextRequest) {
 
     if (onlyActive) {
       whereCondition.OR = [
-        { isVinylPresale: true, endDate: { gte: new Date() } }, // Active presales
-        { isVinylPresale: false }, // Digital releases
-        { showAsDigital: true }, // Digital releases from ended presales
+        { 
+          AND: [
+            { isVinylPresale: true }, 
+            { endDate: { gte: new Date() } }
+          ]
+        }, // Active presales (vinyl presales that haven't ended)
+        { isVinylPresale: false }, // All digital releases (including ended presales)
       ];
     }
 
