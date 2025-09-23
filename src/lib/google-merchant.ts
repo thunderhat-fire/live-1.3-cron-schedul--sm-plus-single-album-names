@@ -22,22 +22,25 @@ interface GoogleMerchantProduct {
   title: string;
   description: string;
   link: string;
-  imageLink: string;  // Keep camelCase - this appears to be correct
+  imageLink: string;
   availability: 'in stock' | 'out of stock' | 'preorder';
   price: {
     value: string;
     currency: string;
   };
-  gtin?: string;
   brand: string;
   condition: 'new' | 'refurbished' | 'used';
-  googleProductCategory: string;  // Keep camelCase - this appears to be correct  
-  productType?: string;  // Keep camelCase and make optional
-  customLabel0?: string; // Genre - Keep camelCase
-  customLabel1?: string; // Record Size - Keep camelCase
-  customLabel2?: string; // Artist Tier - Keep camelCase
-  customLabel3?: string; // Presale Status - Keep camelCase
-  customLabel4?: string; // Target Orders - Keep camelCase
+  googleProductCategory: string;
+  channel: 'online' | 'local';  // Required field for Google Merchant
+  contentLanguage: string;       // Required field for Google Merchant
+  targetCountry: string;         // Required field for Google Merchant
+  gtin?: string;
+  productType?: string;
+  customLabel0?: string;
+  customLabel1?: string;
+  customLabel2?: string;
+  customLabel3?: string;
+  customLabel4?: string;
 }
 
 class GoogleMerchantService {
@@ -106,13 +109,9 @@ class GoogleMerchantService {
       brand: 'VinylFunders',
       condition: 'new',
       googleProductCategory: '55', // Media > Music
-      // Remove optional fields that are causing validation errors
-      // productType: 'Music > Vinyl Records > Independent Artists',
-      // customLabel0: genre || 'Music',
-      // customLabel1: recordSize,
-      // customLabel2: 'Independent',
-      // customLabel3: isVinylPresale ? 'Presale' : 'Digital',
-      // customLabel4: `${currentOrders}/${targetOrders}`,
+      channel: 'online',           // Required: online sales channel
+      contentLanguage: 'en',       // Required: English content
+      targetCountry: 'GB',         // Required: UK market
     };
   }
 
