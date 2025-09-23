@@ -99,10 +99,10 @@ class GoogleMerchantService {
     // Create product title with artist and format info
     const title = `${name} by ${artistName} - ${recordSize} Vinyl Record${isVinylPresale ? ' (Presale)' : ''}`;
     
-    // Enhanced description with presale info
+    // Enhanced description with presale info (no emojis for Google Merchant)
     const enhancedDescription = `${description}\n\n${isVinylPresale ? 
-      `🎵 VINYL PRESALE: This ${recordSize} vinyl record will be pressed once we reach ${targetOrders} orders. Currently ${currentOrders} of ${targetOrders} orders placed.` : 
-      '🎵 DIGITAL DOWNLOAD: Instant access to high-quality digital tracks.'
+      `VINYL PRESALE: This ${recordSize} vinyl record will be pressed once we reach ${targetOrders} orders. Currently ${currentOrders} of ${targetOrders} orders placed.` : 
+      'DIGITAL DOWNLOAD: Instant access to high-quality digital tracks.'
     }\n\nSupport independent artists on VinylFunders - where music dreams become vinyl reality!`;
 
     // Prepare the product object
