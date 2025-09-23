@@ -24,6 +24,7 @@ interface GoogleMerchantProduct {
   link: string;
   imageLink: string;
   availability: 'in stock' | 'out of stock' | 'preorder';
+  availabilityDate?: string;     // Required for preorder items
   price: {
     value: string;
     currency: string;
@@ -53,7 +54,7 @@ class GoogleMerchantService {
     const config = getGoogleMerchantConfig();
     
     this.merchantId = config.merchantId;
-    this.baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vinylfunders.com';
+    this.baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.vinylfunders.com'; // Use www subdomain
     
     // Initialize Google Content API using JWT (same as test-auth)
     const authClient = new google.auth.JWT(
@@ -76,14 +77,23 @@ class GoogleMerchantService {
   private transformToGoogleProduct(productData: ProductData): GoogleMerchantProduct {
     const { id, name, description, price, recordSize, genre, imageUrl, sideAImage, artistName, isVinylPresale, targetOrders, currentOrders, endDate } = productData;
     
-    // Determine availability status
+    // Determine availability status and availability date
     let availability: 'in stock' | 'out of stock' | 'preorder' = 'preorder';
+    let availabilityDate: string | undefined;
+    
     if (isVinylPresale) {
       const isCompleted = currentOrders >= targetOrders;
       const isExpired = endDate && new Date(endDate) < new Date();
       availability = isCompleted || isExpired ? 'out of stock' : 'preorder';
+      
+      // For preorders, set availability date to 30 days from now (estimated pressing time)
+      if (availability === 'preorder') {
+        const estimatedDate = new Date();
+        estimatedDate.setDate(estimatedDate.getDate() + 30);
+        availabilityDate = estimatedDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+      }
     } else {
-      availability = 'in stock'; // Digital downloads
+      availability = 'in stock'; // Digital downloads - available immediately
     }
 
     // Create product title with artist and format info
@@ -95,7 +105,8 @@ class GoogleMerchantService {
       '🎵 DIGITAL DOWNLOAD: Instant access to high-quality digital tracks.'
     }\n\nSupport independent artists on VinylFunders - where music dreams become vinyl reality!`;
 
-    return {
+    // Prepare the product object
+    const product: GoogleMerchantProduct = {
       offerId: `vinylfunders_${id}`,
       title: title.substring(0, 150), // Google limit
       description: enhancedDescription.substring(0, 5000), // Google limit
@@ -113,6 +124,13 @@ class GoogleMerchantService {
       contentLanguage: 'en',       // Required: English content
       targetCountry: 'GB',         // Required: UK market
     };
+
+    // Add availability date for preorders
+    if (availabilityDate) {
+      product.availabilityDate = availabilityDate;
+    }
+
+    return product;
   }
 
   /**
