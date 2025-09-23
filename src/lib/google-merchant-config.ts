@@ -17,11 +17,31 @@ export function getGoogleMerchantConfig(): GoogleMerchantConfig {
     throw new Error('Missing Google Merchant Center environment variables');
   }
 
+  // Handle different private key formats more robustly
+  let formattedPrivateKey = privateKey;
+  
+  // If the key doesn't contain actual newlines, replace \n with real newlines
+  if (!formattedPrivateKey.includes('\n') && formattedPrivateKey.includes('\\n')) {
+    formattedPrivateKey = formattedPrivateKey.replace(/\\n/g, '\n');
+  }
+  
+  // Remove quotes if they exist
+  formattedPrivateKey = formattedPrivateKey.replace(/^["']|["']$/g, '');
+  
+  // Ensure proper BEGIN/END format
+  if (!formattedPrivateKey.startsWith('-----BEGIN PRIVATE KEY-----')) {
+    throw new Error('Invalid private key format: must start with -----BEGIN PRIVATE KEY-----');
+  }
+  
+  if (!formattedPrivateKey.endsWith('-----END PRIVATE KEY-----')) {
+    throw new Error('Invalid private key format: must end with -----END PRIVATE KEY-----');
+  }
+
   return {
     merchantId,
     projectId,
     clientEmail,
-    privateKey: privateKey.replace(/\\n/g, '\n'), // Handle newlines in private key
+    privateKey: formattedPrivateKey,
     autoSync,
   };
 }
