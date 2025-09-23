@@ -1,4 +1,32 @@
-// Google Merchant Center Configuration
+interface GoogleMerchantConfig {
+  merchantId: string;
+  projectId: string;
+  clientEmail: string;
+  privateKey: string;
+  autoSync: boolean;
+}
+
+export function getGoogleMerchantConfig(): GoogleMerchantConfig {
+  const merchantId = process.env.GOOGLE_MERCHANT_CENTER_ID;
+  const projectId = process.env.GOOGLE_PROJECT_ID;
+  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
+  const autoSync = process.env.GOOGLE_MERCHANT_AUTO_SYNC === 'true';
+
+  if (!merchantId || !projectId || !clientEmail || !privateKey) {
+    throw new Error('Missing Google Merchant Center environment variables');
+  }
+
+  return {
+    merchantId,
+    projectId,
+    clientEmail,
+    privateKey: privateKey.replace(/\\n/g, '\n'), // Handle newlines in private key
+    autoSync,
+  };
+}
+
+// Legacy export for backwards compatibility
 export const GOOGLE_MERCHANT_CONFIG = {
   // Required environment variables
   MERCHANT_ID: process.env.GOOGLE_MERCHANT_CENTER_ID,
