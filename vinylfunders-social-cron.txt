@@ -1,0 +1,14 @@
+# VinylFunders Social Media Automation
+# Posts active vinyl presales to Facebook daily at 9:00 AM UTC
+# 
+# Format: minute hour day month day-of-week command
+# 0 9 * * * = Every day at 9:00 AM UTC
+
+# Main social media posting job
+0 9 * * * curl -X POST "https://www.vinylfunders.com/api/social/scheduler" -H "Content-Type: application/json" -d '{"platforms": ["facebook"], "force": false}' >> /var/log/vinylfunders-social.log 2>&1
+
+# Optional: Backup job for evenings (uncomment if you want twice daily)
+# 0 18 * * * curl -X POST "https://www.vinylfunders.com/api/social/scheduler" -H "Content-Type: application/json" -d '{"platforms": ["facebook"], "force": false}' >> /var/log/vinylfunders-social.log 2>&1
+
+# Weekly log cleanup (runs every Sunday at 2 AM)
+0 2 * * 0 find /var/log -name "vinylfunders-social.log" -mtime +30 -delete 2>/dev/null || true

@@ -1,0 +1,36 @@
+services:
+  # Main VinylFunders social media cron job
+  - type: cron
+    name: vinylfunders-social-automation
+    env: node
+    schedule: "0 9 * * *"  # Daily at 9:00 AM UTC
+    buildCommand: npm install
+    startCommand: |
+      curl -X POST "https://www.vinylfunders.com/api/social/scheduler" \
+      -H "Content-Type: application/json" \
+      -d '{"platforms": ["facebook"], "force": false}' \
+      --max-time 60 \
+      --retry 3 \
+      --retry-delay 5
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FACEBOOK_PAGE_ID
+        value: "110145744244208"
+      - key: FACEBOOK_PAGE_ACCESS_TOKEN
+        sync: false  # Set this manually in Render dashboard for security
+        
+  # Optional: Evening posting cron job (uncomment if needed)
+  # - type: cron
+  #   name: vinylfunders-social-evening
+  #   env: node
+  #   schedule: "0 18 * * *"  # Daily at 6:00 PM UTC
+  #   buildCommand: npm install
+  #   startCommand: |
+  #     curl -X POST "https://www.vinylfunders.com/api/social/scheduler" \
+  #     -H "Content-Type: application/json" \
+  #     -d '{"platforms": ["facebook"], "force": false}' \
+  #     --max-time 60
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production

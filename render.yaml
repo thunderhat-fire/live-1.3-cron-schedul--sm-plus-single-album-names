@@ -1,0 +1,45 @@
+services:
+  # Main VinylFunders web application
+  - type: web
+    name: vinylfunders-web
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FACEBOOK_PAGE_ID
+        value: "110145744244208"
+      - key: FACEBOOK_PAGE_ACCESS_TOKEN
+        sync: false  # Set manually in dashboard
+
+  # Social media automation cron job
+  - type: cron
+    name: vinylfunders-social-cron
+    env: node
+    schedule: "0 9 * * *"  # Every day at 9:00 AM UTC
+    buildCommand: echo "Setting up cron job..."
+    startCommand: |
+      curl -X POST "${RENDER_EXTERNAL_URL:-https://www.vinylfunders.com}/api/social/scheduler" \
+      -H "Content-Type: application/json" \
+      -d '{"platforms": ["facebook"], "force": false}' \
+      --max-time 60 \
+      --retry 3 \
+      --fail \
+      --silent \
+      --show-error
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  # Alternative: Background worker for social media (if cron doesn't work)
+  # - type: worker
+  #   name: vinylfunders-social-worker
+  #   env: node
+  #   buildCommand: npm install
+  #   startCommand: node social-worker.js
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: RENDER_EXTERNAL_URL
+  #       value: https://www.vinylfunders.com
