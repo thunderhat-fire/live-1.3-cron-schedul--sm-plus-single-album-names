@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { syncNftToGoogleMerchant } from '@/lib/google-merchant';
+import GoogleMerchantService from '@/lib/google-merchant';
 
 // Bulk sync all active NFTs to Google Merchant Center
 export async function POST(request: NextRequest) {
@@ -88,32 +88,17 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Sync each NFT to Google Merchant Center
-    const results: any[] = [];
-    const errors: any[] = [];
-    
-    for (const nft of nfts) {
-      try {
-        console.log(`🔄 Syncing NFT: ${nft.name} (${nft.id})`);
-        const result = await syncNftToGoogleMerchant(nft.id);
-        
-        if (result.success) {
-          results.push({ nftId: nft.id, success: true, productId: result.productId });
-        } else {
-          errors.push({ nftId: nft.id, error: result.error });
-        }
-      } catch (error: any) {
-        errors.push({ nftId: nft.id, error: error.message });
-      }
-    }
+    // Use the class to batch sync products
+    const googleMerchant = new GoogleMerchantService();
+    const result = await googleMerchant.batchSyncProducts(productsData);
 
     const response = {
-      success: true,
-      totalProcessed: nfts.length,
-      successCount: results.length,
-      errorCount: errors.length,
-      results,
-      errors,
+      success: result.success,
+      totalProcessed: productsData.length,
+      successCount: result.results.filter(r => r.success).length,
+      errorCount: result.errors.length,
+      results: result.results,
+      errors: result.errors,
     };
 
     console.log('✅ Bulk sync completed:', response);
