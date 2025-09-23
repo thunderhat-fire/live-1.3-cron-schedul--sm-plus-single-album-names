@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { getGoogleMerchantConfig } from '@/lib/google-merchant-config';
 
 interface ProductData {
   id: string;
@@ -45,22 +46,24 @@ class GoogleMerchantService {
   private baseUrl: string;
 
   constructor() {
-    this.merchantId = process.env.GOOGLE_MERCHANT_CENTER_ID || '';
+    // Use the robust config function that handles private key formatting
+    const config = getGoogleMerchantConfig();
+    
+    this.merchantId = config.merchantId;
     this.baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vinylfunders.com';
     
-    // Initialize Google Content API
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        project_id: process.env.GOOGLE_PROJECT_ID,
-      },
-      scopes: ['https://www.googleapis.com/auth/content'],
-    });
+    // Initialize Google Content API using JWT (same as test-auth)
+    const authClient = new google.auth.JWT(
+      config.clientEmail,
+      undefined,
+      config.privateKey,
+      ['https://www.googleapis.com/auth/content'],
+      undefined
+    );
 
     this.contentApi = google.content({
       version: 'v2.1',
-      auth,
+      auth: authClient,
     });
   }
 
