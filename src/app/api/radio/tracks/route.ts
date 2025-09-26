@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     
     // Debug log each track
     tracks.forEach(track => {
-      console.log(`🎵 Track: ${track.name} | Radio: ${track.isRadioEligible} | Audio: ${track.hasPreviewAudio} | User: ${track.user?.name} (${track.user?.subscriptionStatus})`);
+      console.log(`🎵 Track: ${track.name} | Radio: ${track.isRadioEligible} | Audio: ${!!track.previewAudioUrl} | User: ${track.user?.name} (${track.user?.subscriptionStatus})`);
     });
 
     return NextResponse.json({
