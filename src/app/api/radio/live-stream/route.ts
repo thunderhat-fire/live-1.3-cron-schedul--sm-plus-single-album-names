@@ -47,12 +47,73 @@ export async function POST(request: NextRequest) {
             message: 'Live stream started on YouTube' 
           });
         } else {
-          // Start local streaming only
+          // Start local streaming only - first load some tracks
+          
+          // Get available tracks for streaming - match debug criteria  
+          const availableNFTs = await prisma.nFT.findMany({
+            where: {
+              isRadioEligible: true,
+              isDeleted: false,
+              // Remove subscription status requirement to match debug data
+              OR: [
+                { isVinylPresale: false }, // Digital releases
+                { 
+                  isVinylPresale: true,
+                  endDate: { gte: new Date() } // Active presales
+                }
+              ]
+            },
+            include: {
+              user: { select: { name: true } },
+              sideATracks: true,
+              sideBTracks: true,
+            },
+            take: 10, // Limit for performance
+            orderBy: { createdAt: 'desc' }
+          });
+
+          // Convert NFTs to stream tracks
+          const streamTracks = availableNFTs.map(nft => {
+            const allTracks = [...(nft.sideATracks || []), ...(nft.sideBTracks || [])];
+            const totalDuration = allTracks.reduce((sum, track) => sum + (track.duration || 0), 0);
+
+            return {
+              name: nft.name || 'Unknown Track',
+              artist: nft.user?.name || 'Unknown Artist', 
+              albumArtUrl: nft.sideAImage || '',
+              albumUrl: `${process.env.NEXT_PUBLIC_APP_URL}/nft-detail/${nft.id}`,
+              duration: totalDuration || 180, // Default 3 minutes if no duration
+              startTime: 0,
+              endTime: totalDuration || 180,
+              genre: nft.genre || 'Unknown',
+              recordLabel: nft.recordLabel || 'Independent',
+            };
+          });
+
+          console.log(`🎵 Live stream starting with ${streamTracks.length} tracks`);
+          
+          // Start streaming with track data
           await liveStreamService.startStreaming(config);
+          
+          // Add tracks to the streaming queue
+          if (streamTracks.length > 0) {
+            for (const track of streamTracks) {
+              liveStreamService.addTrack(track);
+            }
+            
+            // Set the first track as current
+            if (streamTracks[0]) {
+              await liveStreamService.updateCurrentTrack({
+                id: `track-${Date.now()}`,
+                ...streamTracks[0]
+              });
+            }
+          }
           
           return NextResponse.json({ 
             success: true, 
-            message: 'Local live stream started' 
+            message: `Local live stream started with ${streamTracks.length} tracks`,
+            tracksLoaded: streamTracks.length
           });
         }
 

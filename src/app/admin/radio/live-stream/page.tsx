@@ -46,7 +46,7 @@ export default function LiveStreamAdminPage() {
   const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
   const [availableTracks, setAvailableTracks] = useState<any[]>([]);
   const [streamConfig, setStreamConfig] = useState<LiveStreamConfig>({
-    outputUrl: '',
+    outputUrl: './test-output/live-stream.flv', // Local file output for testing
     resolution: '720p',
     fps: 30,
     bitrate: '2500k',
@@ -59,7 +59,7 @@ export default function LiveStreamAdminPage() {
     fontSize: 24,
     transitionDuration: 2,
   });
-  const [youtubeEnabled, setYoutubeEnabled] = useState(false);
+  const [youtubeEnabled, setYoutubeEnabled] = useState(false); // Disabled by default until YouTube live streaming is enabled
   const [streamTitle, setStreamTitle] = useState('VinylFunders Radio - Live Independent Music');
   const [streamDescription, setStreamDescription] = useState('24/7 streaming of independent music from VinylFunders. Discover new artists and support the vinyl revival!');
 
@@ -328,6 +328,9 @@ export default function LiveStreamAdminPage() {
                 className="mr-2"
               />
               Enable YouTube Live Streaming
+              <span className="ml-2 text-xs text-red-500">
+                (⚠️ YouTube live streaming not yet enabled on channel)
+              </span>
             </label>
             
             <label className="flex items-center">

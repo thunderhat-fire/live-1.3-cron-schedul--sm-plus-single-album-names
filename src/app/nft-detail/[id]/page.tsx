@@ -680,7 +680,7 @@ const NftDetailPage = () => {
                             <span className="text-neutral-600">(Completed)</span>
                           ) : (
                             <>
-                              £{nft.targetOrders === 100 ? 26 : nft.targetOrders === 200 ? 22 : nft.targetOrders === 500 ? 20 : 26}
+                              £{nft.recordSize === '7 inch' ? 13 : (nft.targetOrders === 100 ? 26 : nft.targetOrders === 200 ? 22 : nft.targetOrders === 500 ? 20 : 26)}
                             </>
                           )}
                         </div>

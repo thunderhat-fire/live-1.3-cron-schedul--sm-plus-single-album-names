@@ -10,7 +10,7 @@
 console.log('🔗 Facebook Authorization URL Generator\n');
 
 // You'll need your App ID from your Facebook App dashboard
-const APP_ID = 'YOUR_APP_ID_HERE'; // Replace with your actual App ID
+const APP_ID = 'YOUR_APP_ID_HERE'; // Replace with your actual App ID from https://developers.facebook.com/apps/
 const REDIRECT_URI = 'https://developers.facebook.com/tools/explorer/';
 
 // All the permissions we need

@@ -252,12 +252,30 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         const now = Date.now();
         const shouldPreserveTrackState = !force && (now - lastManualTrackChangeTime.current < 2000); // Only 2 seconds for better sync
         
+        // Filter out ads from the playlist for footer player
+        const musicOnlyPlaylist = (data.playlist || []).filter((track: any) => !track.isAd);
+        
+        // Find current track in music-only playlist if main track is an ad
+        let currentTrack = data.currentTrack;
+        let nextTrack = data.nextTrack;
+        
+        if (currentTrack?.isAd) {
+          // If current track is an ad, find the next music track
+          currentTrack = musicOnlyPlaylist[0] || null;
+        }
+        
+        if (nextTrack?.isAd) {
+          // If next track is an ad, find the next music track after current
+          const currentIndex = musicOnlyPlaylist.findIndex((t: any) => t.id === currentTrack?.id);
+          nextTrack = musicOnlyPlaylist[currentIndex + 1] || musicOnlyPlaylist[0] || null;
+        }
+
         setRadioState(prev => ({
           ...prev,
           isPlaying: data.isActive,
           // Preserve current track and next track if we recently made a manual change
-          currentTrack: shouldPreserveTrackState ? prev.currentTrack : data.currentTrack,
-          nextTrack: shouldPreserveTrackState ? prev.nextTrack : data.nextTrack,
+          currentTrack: shouldPreserveTrackState ? prev.currentTrack : currentTrack,
+          nextTrack: shouldPreserveTrackState ? prev.nextTrack : nextTrack,
           totalListeners: data.totalListeners || 0,
           peakListeners: data.peakListeners || 0,
           uptime: data.uptime || 0,
@@ -265,7 +283,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
           progress: shouldPreserveTrackState ? prev.progress : (data.progress || 0),
           totalDuration: data.totalDuration || 0,
           currentTrackIndex: shouldPreserveTrackState ? prev.currentTrackIndex : (data.currentTrackIndex || 0),
-          playlist: data.playlist || [],
+          playlist: musicOnlyPlaylist, // Use filtered playlist without ads
           playlistId: data.playlistId || null,
           isLoading: false,
         }));
@@ -728,7 +746,8 @@ export function RadioProvider({ children }: { children: ReactNode }) {
 
           // Check if track has a direct audio URL (for ads/intros) or use the stream
           const directUrl = track.audioUrl;
-          if (directUrl) {
+          if (directUrl && !track.isAd) {
+            // Only use direct URL for non-ad tracks
             audioElement.current.src = directUrl;
           } else {
             audioElement.current.src = '/api/radio/audio-stream';

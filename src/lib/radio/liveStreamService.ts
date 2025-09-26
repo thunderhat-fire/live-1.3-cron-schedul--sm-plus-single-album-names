@@ -384,7 +384,7 @@ class VideoGenerator {
     
     try {
       // Use URLs directly in FFmpeg instead of downloading
-      const albumArtUrl = this.optimizeCloudinaryUrl(track.albumArtUrl, 600); // Optimize for streaming
+      const albumArtUrl = this.optimizeImageUrl(track.albumArtUrl, 600); // Optimize for streaming (Wasabi/Cloudinary)
       const qrCodePath = await this.generateQRCode(track.albumUrl, 'qr-code');
       
       // Create FFmpeg filter for composite image using direct URLs
@@ -599,9 +599,11 @@ class VideoGenerator {
   }
 
   /**
-   * Optimize Cloudinary URL for streaming
+   * Optimize image URL for streaming (supports both Cloudinary and Wasabi S3)
    */
-  private optimizeCloudinaryUrl(url: string, width: number): string {
+  private optimizeImageUrl(url: string, width: number): string {
+    console.log(`🖼️ Optimizing image URL: ${url}`);
+    
     // Check if it's a Cloudinary URL
     if (url.includes('cloudinary.com')) {
       try {
@@ -620,14 +622,27 @@ class VideoGenerator {
             'fl_progressive' // Progressive loading
           ].join(',');
           
-          return `${baseUrl}${optimizations}/${imagePath}`;
+          const optimizedUrl = `${baseUrl}${optimizations}/${imagePath}`;
+          console.log(`🖼️ Cloudinary optimized: ${optimizedUrl}`);
+          return optimizedUrl;
         }
       } catch (error) {
         console.warn('Failed to optimize Cloudinary URL:', error);
       }
     }
     
-    // Return original URL if not Cloudinary or optimization failed
+    // Check if it's a Wasabi S3 URL
+    if (url.includes('wasabisys.com') || url.includes('s3.')) {
+      console.log(`🖼️ Wasabi S3 URL detected: ${url}`);
+      // For Wasabi/S3, we can add cache-busting and ensure proper format
+      const separator = url.includes('?') ? '&' : '?';
+      const optimizedUrl = `${url}${separator}w=${width}&t=${Date.now()}`;
+      console.log(`🖼️ Wasabi optimized: ${optimizedUrl}`);
+      return optimizedUrl;
+    }
+    
+    // Return original URL if not recognized or optimization failed
+    console.log(`🖼️ Using original URL: ${url}`);
     return url;
   }
 
