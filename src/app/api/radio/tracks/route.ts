@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
       where: {
         isRadioEligible: true,
         isDeleted: false,
-        hasPreviewAudio: true,
+        previewAudioUrl: { not: null },
         // No subscription status filtering
       },
       include: {
