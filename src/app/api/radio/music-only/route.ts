@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     const musicTracks = await prisma.nFT.findMany({
       where: {
         isRadioEligible: true,
-        isActive: true,
+        isDeleted: false,
         OR: [
           { isVinylPresale: false }, // Digital releases
           { 
