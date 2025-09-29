@@ -159,18 +159,22 @@ const NftDetailPage = () => {
 
   // Function to get current price based on presale status
   const getCurrentPrice = () => {
-    // If presale is completed, only digital is available at £13
-    if (isVinylPresaleComplete) return 13;
-    
-    // If not a presale, always digital price
-    if (!nft?.isVinylPresale) return 13;
-    
-    // Check record size for pricing
-    if (nft.recordSize === '7 inch') {
-      return 13; // Fixed price for 7-inch records
+    // If presale is completed, only digital is available
+    if (isVinylPresaleComplete) {
+      return nft?.recordSize === '7 inch' ? 4 : 13; // £4 for 7-inch digital, £13 for 12-inch digital
     }
     
-    // 12-inch tiered pricing based on target orders
+    // If not a presale, always digital price
+    if (!nft?.isVinylPresale) {
+      return nft?.recordSize === '7 inch' ? 4 : 13; // £4 for 7-inch digital, £13 for 12-inch digital
+    }
+    
+    // Check record size for vinyl pricing
+    if (nft.recordSize === '7 inch') {
+      return 13; // Fixed price for 7-inch vinyl presales
+    }
+    
+    // 12-inch vinyl tiered pricing based on target orders
     if (nft.targetOrders === 100) return 26;
     if (nft.targetOrders === 200) return 22;
     if (nft.targetOrders === 500) return 20;
@@ -702,7 +706,7 @@ const NftDetailPage = () => {
                       <div className="text-center">
                         <div className="font-semibold">Digital Download</div>
                         <div className="text-xs mt-1 bg-green-100/50 rounded px-2 py-1">
-                          £13.00
+                          £{nft?.recordSize === '7 inch' ? '4.00' : '13.00'}
                           {!isDigitalAvailable && <span className="ml-1">(Not Yet Available)</span>}
                         </div>
                       </div>
@@ -816,13 +820,13 @@ const NftDetailPage = () => {
                         £{(
                           selectedFormat === 'vinyl' 
                             ? getCurrentPrice() * vinylQuantity 
-                            : 13.00 * digitalQuantity
+                            : (nft?.recordSize === '7 inch' ? 4.00 : 13.00) * digitalQuantity
                         ).toFixed(2)}
                       </span>
                     </div>
                     <div className="text-xs text-neutral-500 mt-1">
                       {selectedFormat === 'vinyl' && vinylQuantity > 1 && <span className="bg-green-100/50 rounded px-2 py-1">{vinylQuantity} × £{getCurrentPrice()}</span>}
-                      {selectedFormat === 'digital' && digitalQuantity > 1 && <span className="bg-green-100/50 rounded px-2 py-1">{digitalQuantity} × £13.00</span>}
+                      {selectedFormat === 'digital' && digitalQuantity > 1 && <span className="bg-green-100/50 rounded px-2 py-1">{digitalQuantity} × £{(nft?.recordSize === '7 inch' ? 4.00 : 13.00).toFixed(2)}</span>}
                     </div>
                   </div>
 
@@ -914,7 +918,7 @@ const NftDetailPage = () => {
                     <div className="text-2xl font-semibold bg-green-100/50 rounded px-2 py-1 inline-block">
                       {!isVinylPresaleComplete
                         ? `Pre-sale Price: £${getCurrentPrice()}`
-                        : `Digital Price: £13.00`
+                        : `Digital Price: £${getCurrentPrice().toFixed(2)}`
                       }
                     </div>
                     <div className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
@@ -1016,7 +1020,7 @@ const NftDetailPage = () => {
 
 🎵 Genre: ${nft.genre || 'N/A'}
 💿 Record Size: ${nft.recordSize}
-${nft.isVinylPresale ? `💰 Pre-sale Price: £${getCurrentPrice()}` : `💰 Digital Price: £13.00`}
+${nft.isVinylPresale ? `💰 Pre-sale Price: £${getCurrentPrice()}` : `💰 Digital Price: £${getCurrentPrice().toFixed(2)}`}
 ${nft.isVinylPresale ? `🎯 Target Orders: ${nft.targetOrders}` : ''}
 ${nft.isVinylPresale ? `📊 Current Orders: ${nft.currentOrders}` : ''}
 

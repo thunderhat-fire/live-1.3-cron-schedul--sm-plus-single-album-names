@@ -145,7 +145,7 @@ const PageCollection: FC = () => {
   
   // Digital floor price is always £13 if any digital items exist
   const hasDigitalItems = nfts.some(nft => nft.showAsDigital || !nft.wasVinylPresale);
-  const digitalFloorPrice = hasDigitalItems ? 13.00 : null;
+  const digitalFloorPrice = hasDigitalItems ? 4.00 : null; // Minimum digital price (7-inch)
   
   // Fix volume calculation: use ORIGINAL presale prices, not current displayed prices
   const volume = nfts.reduce((sum, nft) => {
@@ -163,7 +163,9 @@ const PageCollection: FC = () => {
     // 2. Add actual digital download revenue
     const digitalSalesCount = digitalSalesData[nft.id] || 0;
     if (digitalSalesCount > 0) {
-      nftRevenue += (digitalSalesCount * 13.00); // Digital downloads are always £13
+      // Use appropriate digital price based on record size
+      const digitalPrice = nft.recordSize === '7 inch' ? 4.00 : 13.00;
+      nftRevenue += (digitalSalesCount * digitalPrice);
     }
     
     return sum + nftRevenue;

@@ -47,12 +47,22 @@ export async function POST(request: Request) {
     }
 
     // Calculate price
-    let vinylPrice = 26;
-    if (nft.targetOrders === 200) vinylPrice = 22;
-    if (nft.targetOrders === 500) vinylPrice = 20;
-    const price = format === 'digital'
-      ? (vinylPrice / 2)
-      : vinylPrice;
+    let price: number;
+    
+    if (format === 'digital') {
+      // Digital pricing based on record size
+      price = nft.recordSize === '7 inch' ? 4.00 : 13.00;
+    } else {
+      // Vinyl pricing
+      if (nft.recordSize === '7 inch') {
+        price = 13.00; // Fixed price for 7-inch vinyl
+      } else {
+        // 12-inch tiered pricing based on target orders
+        if (nft.targetOrders === 200) price = 22.00;
+        else if (nft.targetOrders === 500) price = 20.00;
+        else price = 26.00; // Default for 100 orders or unspecified
+      }
+    }
 
     // Create order
     const order = await prisma.order.create({

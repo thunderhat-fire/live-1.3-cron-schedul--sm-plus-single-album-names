@@ -296,11 +296,22 @@ export async function GET(request: Request) {
           true;
         
         // Set price based on presale completion status
-        let vinylPrice = 26;
-        if (nft.targetOrders === 200) vinylPrice = 22;
-        if (nft.targetOrders === 500) vinylPrice = 20;
+        let price: number;
         
-        const price = showAsDigital ? 13.00 : vinylPrice;
+        if (showAsDigital) {
+          // Digital pricing based on record size
+          price = nft.recordSize === '7 inch' ? 4.00 : 13.00;
+        } else {
+          // Vinyl pricing
+          if (nft.recordSize === '7 inch') {
+            price = 13.00; // Fixed price for 7-inch vinyl
+          } else {
+            // 12-inch tiered pricing based on target orders
+            if (nft.targetOrders === 200) price = 22.00;
+            else if (nft.targetOrders === 500) price = 20.00;
+            else price = 26.00; // Default for 100 orders or unspecified
+          }
+        }
 
         // Debug: log image URLs to see what's being returned
         console.log('🖼️ NFT Image URLs:', {

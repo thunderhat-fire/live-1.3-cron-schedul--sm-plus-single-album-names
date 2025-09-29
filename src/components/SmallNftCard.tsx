@@ -31,15 +31,17 @@ interface SmallNftCardProps {
 const SmallNftCard: React.FC<SmallNftCardProps> = ({ nft }) => {
   // Calculate correct price based on record size and presale status
   const getCorrectPrice = () => {
-    // If presale is completed or showing as digital, always £13
-    if (nft.showAsDigital || !nft.isVinylPresale) return 13;
-    
-    // Check record size for pricing
-    if (nft.recordSize === '7 inch') {
-      return 13; // Fixed price for 7-inch records
+    // If presale is completed or showing as digital, use digital pricing
+    if (nft.showAsDigital || !nft.isVinylPresale) {
+      return nft.recordSize === '7 inch' ? 4 : 13; // £4 for 7-inch digital, £13 for 12-inch digital
     }
     
-    // 12-inch tiered pricing based on target orders
+    // Vinyl pricing - check record size first
+    if (nft.recordSize === '7 inch') {
+      return 13; // Fixed price for 7-inch vinyl
+    }
+    
+    // 12-inch vinyl tiered pricing based on target orders
     if (nft.targetOrders === 100) return 26;
     if (nft.targetOrders === 200) return 22;
     if (nft.targetOrders === 500) return 20;
