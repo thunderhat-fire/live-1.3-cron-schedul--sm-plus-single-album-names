@@ -23,6 +23,7 @@ interface UserWithSubscription {
     currentOrders: number | null;
     targetOrders: number | null;
     isVinylPresale: boolean;
+    recordSize: string | null;
   }[];
 }
 
