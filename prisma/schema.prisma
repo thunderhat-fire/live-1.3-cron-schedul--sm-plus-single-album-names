@@ -43,6 +43,7 @@ model User {
   stripeOnboardingUrl      String?
   stripePayoutsEnabled     Boolean                  @default(false)
   stripeTosAcceptance      DateTime?
+  syncSubmissionOptIn      Boolean                  @default(false)
   abuseReports             AbuseReport[]
   accounts                 Account[]
   comments                 Comment[]

@@ -48,6 +48,7 @@ interface FormData {
   sideB: VinylSide;
   targetOrders: number;
   extendPresaleToFourWeeks: boolean; // New field for Gold tier extension
+  syncSubmissionOptIn: boolean; // New field for TV/Film/Games sync submission
 }
 
 const GENRES = [
@@ -103,7 +104,8 @@ const defaultFormData: FormData = {
     totalDuration: 0
   },
   targetOrders: 100,
-  extendPresaleToFourWeeks: false
+  extendPresaleToFourWeeks: false,
+  syncSubmissionOptIn: false
 };
 
 interface Address {
@@ -247,6 +249,21 @@ const PageUploadItem = () => {
               ...prev,
               recordLabel: session.user.recordLabel || ''
             }));
+          }
+
+          // Load user's sync submission preference
+          try {
+            const syncResponse = await fetch('/api/users/sync-submission');
+            if (syncResponse.ok) {
+              const syncData = await syncResponse.json();
+              setFormData(prev => ({
+                ...prev,
+                syncSubmissionOptIn: syncData.syncSubmissionOptIn || false
+              }));
+            }
+          } catch (error) {
+            console.error('Failed to load sync submission preference:', error);
+            // Don't fail the component for this
           }
           
         } catch (error) {
@@ -732,6 +749,20 @@ const PageUploadItem = () => {
       }
       const nftDataResponse = await nftResponse.json();
       console.log('🎉 NFT creation response:', nftDataResponse);
+
+      // Update user's sync submission preference if it was changed
+      try {
+        await fetch('/api/users/sync-submission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ syncSubmissionOptIn: formData.syncSubmissionOptIn }),
+        });
+        console.log('Sync submission preference updated:', formData.syncSubmissionOptIn);
+      } catch (error) {
+        console.error('Failed to update sync submission preference:', error);
+        // Don't fail the entire upload for this
+      }
+
       setSuccess('Vinyl Album created successfully!');
       
       // Refresh the session to get updated user data (including decremented credits)
@@ -1287,6 +1318,28 @@ const PageUploadItem = () => {
                 </div>
               </div>
             )}
+
+            {/* TV/Film/Games Sync Submission Checkbox */}
+            <div className="form-group col-span-12 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+              <div className="flex items-start space-x-3">
+                <input
+                  id="syncSubmission"
+                  type="checkbox"
+                  checked={formData.syncSubmissionOptIn}
+                  onChange={(e) => setFormData({ ...formData, syncSubmissionOptIn: e.target.checked })}
+                  className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-neutral-300 rounded"
+                />
+                <div className="flex-1">
+                  <label htmlFor="syncSubmission" className="text-sm font-medium text-neutral-900 dark:text-neutral-100 cursor-pointer">
+                    Tick this box if you want your music to be submitted to TV/Film and Games Sync - royalties paid to you
+                  </label>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                    By opting in, your music will be considered for synchronization opportunities in television, film, and gaming projects. 
+                    You will receive 100% of any sync licensing royalties earned from these placements.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             <div className="pt-2 flex flex-col sm:flex-row space-y-3 sm:space-y-0 space-x-0 sm:space-x-3">
               <ButtonPrimary type="submit" className="flex-1" disabled={isUploading}>
