@@ -8,6 +8,8 @@ export async function GET() {
       SELECT 
         n."recordLabel" as name,
         COUNT(n.id) as count,
+        COUNT(CASE WHEN n."recordSize" = '7 inch' THEN 1 END) as "singlesCount",
+        COUNT(CASE WHEN n."recordSize" = '12 inch' THEN 1 END) as "albumsCount",
         -- Get the first available record label image from any plus/gold user with this label
         (
           SELECT u2."recordLabelImage" 
@@ -44,6 +46,8 @@ export async function GET() {
     const transformedRecordLabels = (recordLabels as any[]).map(label => ({
       name: label.name,
       count: parseInt(label.count),
+      singlesCount: parseInt(label.singlesCount || 0),
+      albumsCount: parseInt(label.albumsCount || 0),
       recordLabelImage: label.recordLabelImage,
       nfts: (label.nfts || []).slice(0, 4).map((nft: any) => ({
         id: nft.id,

@@ -88,7 +88,8 @@ export async function GET(request: Request) {
             favoritesCount: true,
             currentOrders: true,
             targetOrders: true,
-            isVinylPresale: true
+            isVinylPresale: true,
+            recordSize: true
           },
           where: {
             isDeleted: false,
@@ -113,6 +114,8 @@ export async function GET(request: Request) {
       
       // Calculate metrics
       const nftsCount = nfts.length;
+      const singlesCount = nfts.filter(nft => nft.recordSize === '7 inch').length;
+      const albumsCount = nfts.filter(nft => nft.recordSize === '12 inch').length;
       const totalViews = nfts.reduce((sum, nft) => sum + (nft.viewCount || 0), 0);
       const totalLikes = nfts.reduce((sum, nft) => sum + (nft.favoritesCount || 0), 0);
       const totalOrdersReceived = nfts.reduce((sum, nft) => {
@@ -138,7 +141,9 @@ export async function GET(request: Request) {
         performanceScore,
         totalOrdersReceived,
         totalViews,
-        totalLikes
+        totalLikes,
+        singlesCount,
+        albumsCount
       };
     })
     .filter(user => user._count.nfts > 0) // Only users with NFTs
@@ -159,6 +164,8 @@ export async function GET(request: Request) {
       image: user.image,
       bio: user.bio,
       nftsCount: user._count.nfts,
+      singlesCount: user.singlesCount,
+      albumsCount: user.albumsCount,
       followersCount: user._count.User_B,
       isFollowing: user.User_A?.length > 0,
       subscriptionTier: user.subscriptionTier,

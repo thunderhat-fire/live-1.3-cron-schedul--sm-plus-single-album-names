@@ -11,6 +11,8 @@ export interface CollectionCard2Props {
   recordLabel?: {
     name: string;
     count: number;
+    singlesCount?: number;
+    albumsCount?: number;
     recordLabelImage?: string;
     nfts: {
       id: string;
@@ -82,7 +84,20 @@ const CollectionCard2: FC<CollectionCard2Props> = ({
             <VerifyIcon iconClass="w-4 h-4" subscriptionTier={creatorSubscriptionTier} />
           </div>
           <span className="mb-0.5 ml-2 inline-flex justify-center items-center px-2 py-1.5 border-2 border-secondary-500 text-secondary-500 rounded-md text-xs !leading-none font-medium">
-            {recordLabel.count} {recordLabel.count === 1 ? 'Album' : 'Albums'}
+            {(() => {
+              const singles = recordLabel.singlesCount || 0;
+              const albums = recordLabel.albumsCount || 0;
+              const total = singles + albums;
+              
+              if (total === 0) return '0 Releases';
+              if (singles > 0 && albums > 0) {
+                return `${singles} Single${singles !== 1 ? 's' : ''} • ${albums} Album${albums !== 1 ? 's' : ''}`;
+              }
+              if (singles > 0) {
+                return `${singles} Single${singles !== 1 ? 's' : ''}`;
+              }
+              return `${albums} Album${albums !== 1 ? 's' : ''}`;
+            })()}
           </span>
         </div>
       </div>

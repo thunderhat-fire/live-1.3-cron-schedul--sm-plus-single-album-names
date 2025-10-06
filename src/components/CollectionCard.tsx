@@ -9,6 +9,8 @@ export interface CollectionCardProps {
   recordLabel?: {
     name: string;
     count: number;
+    singlesCount?: number;
+    albumsCount?: number;
     recordLabelImage?: string;
     nfts: {
       id: string;
@@ -78,7 +80,20 @@ const CollectionCard: FC<CollectionCardProps> = ({
         </div>
         {/* COUNT */}
         <div className="mt-3 text-white text-sm">
-          {recordLabel.count} {recordLabel.count === 1 ? 'Album' : 'Albums'}
+          {(() => {
+            const singles = recordLabel.singlesCount || 0;
+            const albums = recordLabel.albumsCount || 0;
+            const total = singles + albums;
+            
+            if (total === 0) return '0 Releases';
+            if (singles > 0 && albums > 0) {
+              return `${singles} Single${singles !== 1 ? 's' : ''} • ${albums} Album${albums !== 1 ? 's' : ''}`;
+            }
+            if (singles > 0) {
+              return `${singles} Single${singles !== 1 ? 's' : ''}`;
+            }
+            return `${albums} Album${albums !== 1 ? 's' : ''}`;
+          })()}
         </div>
       </div>
       <Link href={`/collection?label=${encodeURIComponent(recordLabel.name)}`} className="absolute inset-0"></Link>

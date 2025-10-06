@@ -15,6 +15,8 @@ export interface SectionSliderCategoriesProps {
 interface RecordLabel {
   name: string;
   count: number;
+  singlesCount?: number;
+  albumsCount?: number;
   nfts: {
     id: string;
     name: string;
@@ -106,6 +108,8 @@ const SectionSliderCategories: FC<SectionSliderCategoriesProps> = ({
               featuredImage={item.nfts[0]?.sideAImage || '/images/default-record-label.jpg'}
               name={item.name}
               nftCount={item.count}
+              singlesCount={item.singlesCount}
+              albumsCount={item.albumsCount}
             />
           );
         }}

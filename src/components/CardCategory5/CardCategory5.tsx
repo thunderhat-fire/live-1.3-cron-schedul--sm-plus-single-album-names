@@ -10,6 +10,8 @@ export interface CardCategory5Props {
   name: string;
   index: number;
   nftCount?: number;
+  singlesCount?: number;
+  albumsCount?: number;
 }
 
 const COLORS = [
@@ -31,6 +33,8 @@ const CardCategory5: FC<CardCategory5Props> = ({
   name,
   index,
   nftCount = 0,
+  singlesCount = 0,
+  albumsCount = 0,
 }) => {
   return (
     <Link
@@ -60,7 +64,20 @@ const CardCategory5: FC<CardCategory5Props> = ({
           <span
             className={`block mt-1 text-sm text-neutral-6000 dark:text-neutral-400`}
           >
-            {nftCount} {nftCount === 1 ? 'Album' : 'Albums'}
+            {(() => {
+              const singles = singlesCount || 0;
+              const albums = albumsCount || 0;
+              const total = singles + albums;
+              
+              if (total === 0) return '0 Releases';
+              if (singles > 0 && albums > 0) {
+                return `${singles} Single${singles !== 1 ? 's' : ''} • ${albums} Album${albums !== 1 ? 's' : ''}`;
+              }
+              if (singles > 0) {
+                return `${singles} Single${singles !== 1 ? 's' : ''}`;
+              }
+              return `${albums} Album${albums !== 1 ? 's' : ''}`;
+            })()}
           </span>
         </div>
       </div>

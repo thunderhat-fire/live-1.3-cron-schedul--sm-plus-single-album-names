@@ -126,26 +126,29 @@ const PageCollection: FC = () => {
     fetchNFTs();
   }, []);
 
-  // Calculate dynamic stats - fix floor prices to show actual vinyl prices
-  const floorPrice7 = nfts.filter(nft => 
+  // Calculate dynamic stats - show standard pricing structure
+  const has7InchVinyl = nfts.some(nft => 
     (nft.recordSize === '7inch' || nft.recordSize === '7 inch') && nft.wasVinylPresale
-  ).reduce((min, nft) => {
-    // Calculate original vinyl price based on target orders
-    const originalPrice = nft.targetOrders === 100 ? 26 : nft.targetOrders === 200 ? 22 : nft.targetOrders === 500 ? 20 : 26;
-    return Math.min(min, originalPrice);
-  }, Infinity);
-  
-  const floorPrice12 = nfts.filter(nft => 
+  );
+  const has12InchVinyl = nfts.some(nft => 
     (nft.recordSize === '12inch' || nft.recordSize === '12 inch') && nft.wasVinylPresale
-  ).reduce((min, nft) => {
-    // Calculate original vinyl price based on target orders
-    const originalPrice = nft.targetOrders === 100 ? 26 : nft.targetOrders === 200 ? 22 : nft.targetOrders === 500 ? 20 : 26;
-    return Math.min(min, originalPrice);
-  }, Infinity);
+  );
   
-  // Digital floor price is always £13 if any digital items exist
+  // Standard vinyl pricing
+  const floorPrice7 = has7InchVinyl ? 13.00 : Infinity;
+  const floorPrice12 = has12InchVinyl ? 26.00 : Infinity;
+  
+  // Digital pricing - check if we have digital items
   const hasDigitalItems = nfts.some(nft => nft.showAsDigital || !nft.wasVinylPresale);
-  const digitalFloorPrice = hasDigitalItems ? 4.00 : null; // Minimum digital price (7-inch)
+  const has7InchDigital = nfts.some(nft => 
+    (nft.recordSize === '7inch' || nft.recordSize === '7 inch') && (nft.showAsDigital || !nft.wasVinylPresale)
+  );
+  const has12InchDigital = nfts.some(nft => 
+    (nft.recordSize === '12inch' || nft.recordSize === '12 inch') && (nft.showAsDigital || !nft.wasVinylPresale)
+  );
+  
+  const digitalSinglePrice = has7InchDigital ? 4.00 : null;
+  const digitalAlbumPrice = has12InchDigital ? 13.00 : null;
   
   // Fix volume calculation: use ORIGINAL presale prices, not current displayed prices
   const volume = nfts.reduce((sum, nft) => {
@@ -297,15 +300,21 @@ const PageCollection: FC = () => {
                         <span className="text-xs text-green-500 ml-2">12" Vinyl</span>
                       </div>
                     )}
-                    {/* Digital Price */}
-                    {digitalFloorPrice && (
+                    {/* Digital Prices */}
+                    {digitalSinglePrice && (
                       <div className="flex items-center justify-center">
-                        <span className="text-sm font-medium">£{digitalFloorPrice.toFixed(2)}</span>
-                        <span className="text-xs text-blue-500 ml-2">Digital</span>
+                        <span className="text-sm font-medium">£{digitalSinglePrice.toFixed(2)}</span>
+                        <span className="text-xs text-blue-500 ml-2">Digital Single/EP</span>
+                      </div>
+                    )}
+                    {digitalAlbumPrice && (
+                      <div className="flex items-center justify-center">
+                        <span className="text-sm font-medium">£{digitalAlbumPrice.toFixed(2)}</span>
+                        <span className="text-xs text-blue-500 ml-2">Digital Album</span>
                       </div>
                     )}
                     {/* Fallback if no prices available */}
-                    {floorPrice7 === Infinity && floorPrice12 === Infinity && !digitalFloorPrice && (
+                    {floorPrice7 === Infinity && floorPrice12 === Infinity && !digitalSinglePrice && !digitalAlbumPrice && (
                       <div className="text-neutral-400">--</div>
                     )}
                   </div>

@@ -26,6 +26,8 @@ export interface Creator {
   image: string | null;
   bio: string | null;
   nftsCount: number;
+  singlesCount?: number;
+  albumsCount?: number;
   followersCount: number;
   isFollowing: boolean;
   subscriptionTier?: string;
@@ -94,7 +96,22 @@ const CardAuthorBox: FC<CardAuthorBoxProps> = ({
             <div className="mt-1 text-sm font-medium text-center">
               <span className="text-white">{author.followersCount || 0} followers</span>
               <br />
-              <span className="text-white">{author.nftsCount || 0} Albums</span>
+              <span className="text-white">
+                {(() => {
+                  const singles = author.singlesCount || 0;
+                  const albums = author.albumsCount || 0;
+                  const total = singles + albums;
+                  
+                  if (total === 0) return '0 Releases';
+                  if (singles > 0 && albums > 0) {
+                    return `${singles} Single${singles !== 1 ? 's' : ''} • ${albums} Album${albums !== 1 ? 's' : ''}`;
+                  }
+                  if (singles > 0) {
+                    return `${singles} Single${singles !== 1 ? 's' : ''}`;
+                  }
+                  return `${albums} Album${albums !== 1 ? 's' : ''}`;
+                })()}
+              </span>
             </div>
           </div>
 
